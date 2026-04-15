@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
-import { CategoriaService } from "../service/categoria.service";
-
+import { CategoriaService } from "../services/categoria.service";
 
 export class CategoriaController {
 
