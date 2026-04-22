@@ -7,11 +7,11 @@ export class ProdutoController {
     selecionarTodos = async (req: Request, res: Response) => {
         try {
             const produtos = await this._service.selecionarTodos();
-            res.status(200).json({ produtos });
+            return res.status(200).json({ produtos });
         } catch (error: unknown) {
             console.error(error);
             return res.status(500).json({
-                message: "Ocorreu um erro no servidor",
+                message: "Erro no servidor",
                 errorMessage: error instanceof Error ? error.message : "Erro desconhecido"
             });
         }
@@ -21,34 +21,38 @@ export class ProdutoController {
         try {
             const { nomeProduto, valor, idCategoria, idFornecedor } = req.body;
 
-            if (!nomeProduto || !valor || !idCategoria || !idFornecedor) {
+            const valorNum = Number(valor);
+            const idCategoriaNum = Number(idCategoria);
+            const idFornecedorNum = Number(idFornecedor);
+
+            if (!nomeProduto || !valorNum || !idCategoriaNum || !idFornecedorNum) {
                 return res.status(400).json({
-                    message: "Preencha todos os campos obrigatórios"
+                    message: "Preencha todos os campos corretamente"
                 });
             }
 
-            const imagemProduto = req.file?.filename;
+            const imagemProduto = req.file?.filename || req.body.imagemProduto;
 
             if (!imagemProduto) {
                 return res.status(400).json({
-                    message: "Imagem do produto é obrigatória"
+                    message: "Imagem é obrigatória"
                 });
             }
 
             const novo = await this._service.criar(
                 nomeProduto,
-                Number(valor),
-                Number(idCategoria),
-                Number(idFornecedor),
+                valorNum,
+                idCategoriaNum,
+                idFornecedorNum,
                 imagemProduto
             );
 
-            res.status(201).json({ novo });
+            return res.status(201).json({ novo });
 
         } catch (error: unknown) {
             console.error(error);
             return res.status(500).json({
-                message: "Ocorreu um erro no servidor",
+                message: "Erro no servidor",
                 errorMessage: error instanceof Error ? error.message : "Erro desconhecido"
             });
         }
@@ -56,36 +60,41 @@ export class ProdutoController {
 
     editar = async (req: Request, res: Response) => {
         try {
-            const { nomeProduto, valor, idCategoria, idFornecedor } = req.body;
-            const idProduto = Number(req.query.id);
+            const idProduto = Number(req.params.id);
 
             if (!idProduto || isNaN(idProduto)) {
                 return res.status(400).json({ message: "ID inválido" });
             }
 
-            const imagemProduto = req.file?.filename;
+            const { nomeProduto, valor, idCategoria, idFornecedor } = req.body;
 
-            if (!nomeProduto || !valor || !idCategoria || !idFornecedor || !imagemProduto) {
+            const valorNum = Number(valor);
+            const idCategoriaNum = Number(idCategoria);
+            const idFornecedorNum = Number(idFornecedor);
+
+            if (!nomeProduto || !valorNum || !idCategoriaNum || !idFornecedorNum) {
                 return res.status(400).json({
-                    message: "Todos os campos são obrigatórios"
+                    message: "Preencha todos os campos obrigatórios"
                 });
             }
+
+            const imagemProduto = req.file?.filename || req.body.imagemProduto;
 
             const alterado = await this._service.editar(
                 idProduto,
                 nomeProduto,
-                Number(valor),
-                Number(idCategoria),
-                Number(idFornecedor),
+                valorNum,
+                idCategoriaNum,
+                idFornecedorNum,
                 imagemProduto
             );
 
-            res.status(200).json({ alterado });
+            return res.status(200).json({ alterado });
 
         } catch (error: unknown) {
             console.error(error);
             return res.status(500).json({
-                message: "Ocorreu um erro no servidor",
+                message: "Erro no servidor",
                 errorMessage: error instanceof Error ? error.message : "Erro desconhecido"
             });
         }
@@ -93,10 +102,10 @@ export class ProdutoController {
 
     deletar = async (req: Request, res: Response) => {
         try {
-            const idProduto = Number(req.query.id);
+            const idProduto = Number(req.params.id);
 
-            if (!idProduto || idProduto <= 0 || isNaN(idProduto)) {
-                return res.status(400).json({ message: "O id deve ser válido" });
+            if (!idProduto || isNaN(idProduto)) {
+                return res.status(400).json({ message: "ID inválido" });
             }
 
             const deletado = await this._service.deletar(idProduto);
@@ -106,27 +115,21 @@ export class ProdutoController {
             }
 
             return res.status(200).json({
-                message: "Excluído com sucesso",
-                deletado
+                message: "Excluído com sucesso"
             });
 
         } catch (error: unknown) {
             console.error(error);
-
-            if (error instanceof Error) {
-                return res.status(500).json({
-                    message: "Ocorreu um erro no servidor",
-                    errorMessage: error.message
-                });
-            }
-
-            return res.status(500).json({ message: "Erro desconhecido" });
+            return res.status(500).json({
+                message: "Erro no servidor",
+                errorMessage: error instanceof Error ? error.message : "Erro desconhecido"
+            });
         }
     };
 
     selecionaById = async (req: Request, res: Response) => {
         try {
-            const idProduto = Number(req.query.id);
+            const idProduto = Number(req.params.id);
 
             if (!idProduto || isNaN(idProduto)) {
                 return res.status(400).json({ message: "ID inválido" });
@@ -138,13 +141,12 @@ export class ProdutoController {
                 return res.status(404).json({ message: "Produto não encontrado" });
             }
 
-            res.status(200).json({ produto });
+            return res.status(200).json({ produto });
 
         } catch (error: unknown) {
             console.error(error);
             return res.status(500).json({
-                message: "Ocorreu um erro no servidor",
-                errorMessage: error instanceof Error ? error.message : "Erro desconhecido"
+                message: "Erro no servidor"
             });
         }
     };
@@ -153,27 +155,18 @@ export class ProdutoController {
         try {
             const { nomeProduto } = req.query;
 
-            if (!nomeProduto || String(nomeProduto).trim() === "") {
-                return res.status(400).json({
-                    message: "Digite o nome do produto"
-                });
+            if (!nomeProduto) {
+                return res.status(400).json({ message: "Informe o nome" });
             }
 
             const produtos = await this._service.selecionaByNome(String(nomeProduto));
-
-            if (!produtos || (Array.isArray(produtos) && produtos.length === 0)) {
-                return res.status(404).json({
-                    message: "Produto não encontrado"
-                });
-            }
 
             return res.status(200).json({ produtos });
 
         } catch (error: unknown) {
             console.error(error);
             return res.status(500).json({
-                message: "Erro no servidor",
-                errorMessage: error instanceof Error ? error.message : "Erro desconhecido"
+                message: "Erro no servidor"
             });
         }
     };
@@ -181,12 +174,11 @@ export class ProdutoController {
     selecionarAlfabeto = async (req: Request, res: Response) => {
         try {
             const produtos = await this._service.selecionaAbc();
-            res.status(200).json({ produtos });
+            return res.status(200).json({ produtos });
         } catch (error: unknown) {
             console.error(error);
             return res.status(500).json({
-                message: "Erro no servidor",
-                errorMessage: error instanceof Error ? error.message : "Erro desconhecido"
+                message: "Erro no servidor"
             });
         }
     };
