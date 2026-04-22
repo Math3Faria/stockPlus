@@ -1,61 +1,87 @@
 import { RowDataPacket } from "mysql2";
 
 export interface IProduto extends RowDataPacket {
-    id?: number;
-    nomeProd?: string;
+    idProduto?: number;
+    nomeProduto?: string;
     valor?: number;
-    idcategoria?: number;
+    idCategoria?: number;
+    idFornecedor?: number;
+    imagemProduto?: string;
     dataCad?: Date;
 }
 
 export class Produto {
-    private _id?: number;
-    private _nomeProd: string = "";
+    private _idProduto?: number;
+    private _nomeProduto: string = "";
     private _valor: number;
-    private _idCategoria?: number;
+    private _idCategoria: number;
+    private _idFornecedor: number;
+    private _imagemProduto: string;
     private _dataCad?: Date;
 
-    constructor(nomeProd: string, valor: number, idCategoria: number, id?: number) {
-        this.nomeProd = nomeProd;
+    constructor(
+        nomeProduto: string,
+        valor: number,
+        idCategoria: number,
+        idFornecedor: number,
+        imagemProduto: string,
+        idProduto?: number
+    ) {
+        this.nomeProduto = nomeProduto;
         this._valor = valor;
         this._idCategoria = idCategoria;
-        this._id = id;
+        this._idFornecedor = idFornecedor;
+        this._imagemProduto = imagemProduto;
+        this._idProduto = idProduto;
     }
 
-    public get id(): number | undefined { return this._id; }
-
-    public get nomeProd(): string { return this._nomeProd; }
-
-    public get idCategoria(): number | undefined { return this._idCategoria; }
-    
+    public get idProduto(): number | undefined { return this._idProduto; }
+    public get nomeProduto(): string { return this._nomeProduto; }
     public get valor(): number { return this._valor; }
+    public get idCategoria(): number { return this._idCategoria; }
+    public get idFornecedor(): number { return this._idFornecedor; }
+    public get imagemProduto(): string { return this._imagemProduto; }
+    public get dataCad(): Date | undefined { return this._dataCad; }
 
-    public set nomeProd(value: string) {
-        this._validarnomeProd(value);
-        this._nomeProd = value;
+    public set nomeProduto(value: string) {
+        this._validarNomeProduto(value);
+        this._nomeProduto = value;
     }
 
-    public static criar(nomeProd: string, valor: number, idCategoria: number): Produto {
-        return new Produto(nomeProd, valor, idCategoria);
+    public static criar(
+        nomeProduto: string,
+        valor: number,
+        idCategoria: number,
+        idFornecedor: number,
+        imagemProduto: string
+    ): Produto {
+        return new Produto(nomeProduto, valor, idCategoria, idFornecedor, imagemProduto);
     }
 
-    public static editar(id: number, nomeProd: string, valor: number, idCategoria: number): Produto {
-        return new Produto(nomeProd, valor, idCategoria, id);
+    public static editar(
+        idProduto: number,
+        nomeProduto: string,
+        valor: number,
+        idCategoria: number,
+        idFornecedor: number,
+        imagemProduto: string
+    ): Produto {
+        return new Produto(nomeProduto, valor, idCategoria, idFornecedor, imagemProduto, idProduto);
     }
 
-    private _validarnomeProd(value: string): void {
+    public static deletar(idProduto: number): number {
+        if (!idProduto || idProduto <= 0) {
+            throw new Error("O id do produto deve ser válido.");
+        }
+        return idProduto;
+    }
+
+    private _validarNomeProduto(value: string): void {
         if (!value || value.trim().length < 3) {
             throw new Error("Nome do Produto deve ter pelo menos 3 caracteres");
         }
-        if (value.trim().length > 45) {
-            throw new Error("Nome do Produto deve ter no máximo 45 caracteres");
+        if (value.trim().length > 100) {
+            throw new Error("Nome do Produto deve ter no máximo 100 caracteres");
         }
-    }
-
-    public static deletar(id: number): number {
-        if (!id || id <= 0) {
-            throw new Error("O id deve ser um número válido.");
-        }
-        return id;
     }
 }

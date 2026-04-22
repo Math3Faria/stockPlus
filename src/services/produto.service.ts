@@ -2,38 +2,63 @@ import { ProdutoRepository } from "../repository/produto.repository";
 import { Produto } from "../models/produto.model";
 
 export class ProdutoService {
-    constructor(private _repository = new ProdutoRepository()) { }
+    constructor(private _repository = new ProdutoRepository()) {}
 
     async selecionarTodos() {
         return await this._repository.findAll();
     }
 
-    async criar(nomeProd: string, valor: number, idCategoria: number) {
-        const produto = Produto.criar(nomeProd, valor, idCategoria);
+    async criar(
+        nomeProduto: string,
+        valor: number,
+        idCategoria: number,
+        idFornecedor: number,
+        imagemProduto: string
+    ) {
+        const produto = Produto.criar(
+            nomeProduto,
+            valor,
+            idCategoria,
+            idFornecedor,
+            imagemProduto
+        );
+
         return await this._repository.create(produto);
     }
 
-    async editar(id: number, nomeProd: string, valor: number, idCategoria: number){
-        const produto = Produto.editar(id, nomeProd, valor, idCategoria)
-        return await this._repository.update(id, produto)
+    async editar(
+        idProduto: number,
+        nomeProduto: string,
+        valor: number,
+        idCategoria: number,
+        idFornecedor: number,
+        imagemProduto: string
+    ) {
+        const produto = Produto.editar(
+            idProduto,
+            nomeProduto,
+            valor,
+            idCategoria,
+            idFornecedor,
+            imagemProduto
+        );
+
+        return await this._repository.update(idProduto, produto);
     }
 
-    async deletar(id: number){
-        const result =  await this._repository.delete(id)
-        return result;
+    async deletar(idProduto: number) {
+        return await this._repository.delete(idProduto);
     }
 
-    async selecionaById(id: number){
-        const result =  await this._repository.findById(id)
-        return result;
+    async selecionaById(idProduto: number) {
+        return await this._repository.findById(idProduto);
     }
 
-    async selecionaByNome(nomeProd: string){
-        const result =  await this._repository.findByName(nomeProd)
-        return result;
+    async selecionaByNome(nomeProduto: string) {
+        return await this._repository.findByName(nomeProduto);
     }
+
     async selecionaAbc() {
         return await this._repository.findAlfabetic();
     }
-
 }
