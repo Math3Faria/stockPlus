@@ -5,7 +5,7 @@ export class ProdutoService {
     constructor(private _repository = new ProdutoRepository()) {}
 
     async selecionarTodos() {
-        return await this._repository.findAll();
+        return this._repository.findAll();
     }
 
     async criar(
@@ -23,7 +23,13 @@ export class ProdutoService {
             imagemProduto
         );
 
-        return await this._repository.create(produto);
+        return this._repository.create({
+            nomeProduto: produto.nomeProduto,
+            valor: produto.valor,
+            idCategoria: produto.idCategoria,
+            idFornecedor: produto.idFornecedor,
+            imagemProduto: produto.imagemProduto
+        });
     }
 
     async editar(
@@ -43,22 +49,28 @@ export class ProdutoService {
             imagemProduto
         );
 
-        return await this._repository.update(idProduto, produto);
+        return this._repository.update(idProduto, {
+            nomeProduto: produto.nomeProduto,
+            valor: produto.valor,
+            idCategoria: produto.idCategoria,
+            idFornecedor: produto.idFornecedor,
+            imagemProduto: produto.imagemProduto
+        });
     }
 
     async deletar(idProduto: number) {
-        return await this._repository.delete(idProduto);
+        return this._repository.delete(idProduto);
     }
 
     async selecionaById(idProduto: number) {
-        return await this._repository.findById(idProduto);
+        return this._repository.findById(idProduto);
     }
 
     async selecionaByNome(nomeProduto: string) {
-        return await this._repository.findByName(nomeProduto);
+        return this._repository.findByName(nomeProduto);
     }
 
     async selecionaAbc() {
-        return await this._repository.findAlfabetic();
+        return this._repository.findAlfabetic();
     }
 }

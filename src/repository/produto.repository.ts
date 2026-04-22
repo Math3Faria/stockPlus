@@ -1,58 +1,80 @@
 import { db } from "../database/connection.database";
-import { IProduto } from "../models/produto.model";
+import { IProduto, IProdutoCreate } from "../models/produto.model";
 import { ResultSetHeader } from "mysql2/promise";
 
 export class ProdutoRepository {
 
     async findAll(): Promise<IProduto[]> {
         const [rows] = await db.execute<IProduto[]>(
-            'SELECT * FROM produtos;'
+            "SELECT * FROM Produtos"
         );
         return rows;
     }
 
+    async create(dados: IProdutoCreate): Promise<ResultSetHeader> {
+        const sql = `
+            INSERT INTO Produtos 
+            (idCategoria, idFornecedor, nomeProduto, valor, imagemProduto)
+            VALUES (?, ?, ?, ?, ?)
+        `;
 
-    
-    //omite os campos discriminados
-    async create(dados: Omit<IProduto, 'id'>): Promise<ResultSetHeader> {
-        const sql = 'INSERT INTO produtos (nomeProd, valor, idCategoria) VALUES (?,?,?);';
-        const values = [dados._nomeProd, dados._valor, dados._idCategoria];
-        console.log('Teste TIMEOUT: ', values)
-        const [rows] = await db.execute<ResultSetHeader>(sql, values);
-        return rows;
+        const values: (string | number)[] = [
+            dados.idCategoria,
+            dados.idFornecedor,
+            dados.nomeProduto,
+            dados.valor,
+            dados.imagemProduto
+        ];
+
+        return (await db.execute<ResultSetHeader>(sql, values))[0];
     }
 
-    async update(id: number, dados: Omit<IProduto, 'id'>): Promise<ResultSetHeader> {
-        const sql = 'UPDATE produtos SET nomeProd=?, valor=?, idCategoria=? WHERE id=?;';
-        const values = [dados._nomeProd, dados._valor, dados._idCategoria, id];
-        const [rows] = await db.execute<ResultSetHeader>(sql, values)
-        return rows;
+    async update(idProduto: number, dados: IProdutoCreate): Promise<ResultSetHeader> {
+        const sql = `
+            UPDATE Produtos 
+            SET idCategoria=?, idFornecedor=?, nomeProduto=?, valor=?, imagemProduto=?
+            WHERE idProduto=?
+        `;
+
+        const values: (string | number)[] = [
+            dados.idCategoria,
+            dados.idFornecedor,
+            dados.nomeProduto,
+            dados.valor,
+            dados.imagemProduto,
+            idProduto
+        ];
+
+        return (await db.execute<ResultSetHeader>(sql, values))[0];
     }
 
-    async delete(id: number): Promise<ResultSetHeader> {
-        const sql = 'DELETE FROM produtos WHERE id = ?;';
-        const [rows] = await db.execute<ResultSetHeader>(sql, [id]);
-        return rows;
+    async delete(idProduto: number): Promise<ResultSetHeader> {
+        return (await db.execute<ResultSetHeader>(
+            "DELETE FROM Produtos WHERE idProduto=?",
+            [idProduto]
+        ))[0];
     }
 
-    async findById(id: number): Promise<IProduto | undefined> {
-        const sql = 'SELECT * FROM produtos WHERE id = ?;';
-        const [rows] = await db.execute<IProduto[]>(sql, [id]);
+    async findById(idProduto: number): Promise<IProduto | undefined> {
+        const [rows] = await db.execute<IProduto[]>(
+            "SELECT * FROM Produtos WHERE idProduto=?",
+            [idProduto]
+        );
         return rows[0];
     }
 
-    async findByName(nomeProd: string): Promise<IProduto> {
-        const sql = 'SELECT * FROM produtos WHERE nomeProd = ?;';
-        const [rows] = await db.execute<IProduto[]>(sql, [nomeProd]);
-        return rows[0];
+    async findByName(nomeProduto: string): Promise<IProduto[]> {
+        const [rows] = await db.execute<IProduto[]>(
+            "SELECT * FROM Produtos WHERE nomeProduto LIKE ?",
+            [`%${nomeProduto}%`]
+        );
+        return rows;
     }
 
     async findAlfabetic(): Promise<IProduto[]> {
         const [rows] = await db.execute<IProduto[]>(
-            'SELECT * FROM produtos ORDER BY nomeProd ASC;');
+            "SELECT * FROM Produtos ORDER BY nomeProduto ASC"
+        );
         return rows;
     }
-
-
-
 }
