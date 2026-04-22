@@ -1,6 +1,5 @@
 import { RowDataPacket } from "mysql2";
 
-// 👉 usado para SELECT (retorno do banco)
 export interface IProduto extends RowDataPacket {
     idProduto: number;
     nomeProduto: string;
@@ -11,7 +10,6 @@ export interface IProduto extends RowDataPacket {
     dataCad: Date;
 }
 
-// 👉 usado para INSERT e UPDATE
 export interface IProdutoCreate {
     nomeProduto: string;
     valor: number;
@@ -48,7 +46,6 @@ export class Produto {
         this._idProduto = idProduto;
     }
 
-    // getters
     get idProduto() { return this._idProduto; }
     get nomeProduto() { return this._nomeProduto; }
     get valor() { return this._valor; }
@@ -56,7 +53,7 @@ export class Produto {
     get idFornecedor() { return this._idFornecedor; }
     get imagemProduto() { return this._imagemProduto; }
 
-    // factory methods
+
     static criar(
         nomeProduto: string,
         valor: number,
