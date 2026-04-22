@@ -60,3 +60,45 @@ dataValidade date not null,
 dataEntrada timestamp default current_timestamp,
 foreign key (idProduto) references Produtos(idProduto)
 );
+
+
+DELIMITER $$
+
+CREATE TRIGGER trg_atualizar_estoque
+AFTER INSERT ON MovimentacaoEstoque
+FOR EACH ROW
+BEGIN
+
+  DECLARE existe INT;
+
+  SELECT COUNT(*) INTO existe
+  FROM Estoque
+  WHERE idProduto = NEW.idProduto;
+
+  -- cria estoque se não existir (entrada/ajuste)
+  IF existe = 0 THEN
+    INSERT INTO Estoque (idProduto, qtdAtual, qtdMinima, qtdMaxima)
+    VALUES (NEW.idProduto, 0, 0, 0);
+  END IF;
+
+  -- ENTRADA
+  IF NEW.tipo = 'ENTRADA' THEN
+    UPDATE Estoque
+    SET qtdAtual = qtdAtual + NEW.quantidade
+    WHERE idProduto = NEW.idProduto;
+
+  -- SAIDA
+  ELSEIF NEW.tipo = 'SAIDA' THEN
+    UPDATE Estoque
+    SET qtdAtual = qtdAtual - NEW.quantidade
+    WHERE idProduto = NEW.idProduto;
+
+  -- AJUSTE
+  ELSEIF NEW.tipo = 'AJUSTE' THEN
+    UPDATE Estoque
+    SET qtdAtual = qtdAtual + NEW.quantidade;
+  END IF;
+
+END$$
+
+DELIMITER ;
