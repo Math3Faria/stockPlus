@@ -2,18 +2,18 @@ import { RowDataPacket } from "mysql2";
 
 export interface iCategoria extends RowDataPacket {
     id_categoria?: number;
-    nome?: string;
+    descricao?: string;
 }
 
 export class Categoria {
     private _id_categoria?: number;
-    private _nome: string = '';
+    private _descricao: string = '';
 
     constructor(
-        nome: string,
+        descricao: string,
         id?: number
     ) {
-        this.Nome = nome;
+        this.Descricao = descricao;
         this._id_categoria = id;
     }
 
@@ -22,37 +22,37 @@ export class Categoria {
         return this._id_categoria;
     }
 
-    public get Nome(): string {
-        return this._nome;
+    public get Descricao(): string {
+        return this._descricao;
     }
 
     // Setters
-    public set Nome(value: string) {
-        this._validarNome(value);
-        this._nome = value;
+    public set Descricao(value: string) {
+        this._validarDescricao(value);
+        this._descricao = value;
     }
 
     // Factory
     public static criar(
-        nome: string
+        descricao: string
     ): Categoria {
-        return new Categoria(nome);
+        return new Categoria(descricao);
     }
 
     public static editar(
-        nome: string,
+        descricao: string,
         id: number,
     ): Categoria {
-        return new Categoria(nome, id);
+        return new Categoria(descricao, id);
     }
 
-    private _validarNome(value: string): void {
+    private _validarDescricao(value: string): void {
         if (!value || value.trim().length < 3) {
-            throw new Error("Nome da categoria deve ter pelo menos 3 caracteres");
+            throw new Error("Descrição da categoria deve ter pelo menos 3 caracteres");
         }
 
         if (value.trim().length > 100) {
-            throw new Error("Nome da categoria deve ter no máximo 100 caracteres");
+            throw new Error("Descrição da categoria deve ter no máximo 100 caracteres");
         }
     }
 }
