@@ -7,32 +7,53 @@ export class MovimentacaoController {
 
   criar = async (req: Request, res: Response) => {
     try {
-      const id = await this.service.criar(req.body);
+      const result = await this.service.criar(req.body);
 
       return res.status(201).json({
         message: "Movimentação criada com sucesso",
-        id
+        data: result
       });
 
-    } catch (error) {
-      return res.status(400).json({ message: (error as Error).message });
-    }
+    } catch (error: unknown) {
+            console.error(error);
+            if (error instanceof Error) {
+                res.status(500).json({
+                    message: 'Ocorreu um erro no servidor',
+                    errorMessage: error.message
+                })
+            }
+            res.status(500).json({
+                message: 'Ocorreu um erro no servidor',
+                errorMessage: 'Erro desconhecido'
+            })
+        }
   };
 
-  listar = async (_: Request, res: Response) => {
+  listartudo = async (req: Request, res: Response) => {
+    try{
     const dados = await this.service.listar();
-    return res.json(dados);
+    const idMovimentacao = req.query.idMovimentacao;
+            
+            if (idMovimentacao) {
+                const result = await this.service.buscarPorId(Number(idMovimentacao));
+                return res.status(200).json({ movimentacoes: result });
+            }
+      return res.json({ movimentacoes: dados });
+
+    } catch (error: unknown) {
+            console.error(error);
+            if (error instanceof Error) {
+                res.status(500).json({
+                    message: 'Ocorreu um erro no servidor',
+                    errorMessage: error.message
+                })
+            }
+            res.status(500).json({
+                message: 'Ocorreu um erro no servidor',
+                errorMessage: 'Erro desconhecido'
+            })
+        }
+
   };
 
-  buscarPorId = async (req: Request, res: Response) => {
-    try {
-      const id = Number(req.params.id);
-
-      const dados = await this.service.buscarPorId(id);
-      return res.json(dados);
-
-    } catch (error) {
-      return res.status(404).json({ message: (error as Error).message });
-    }
-  };
 }

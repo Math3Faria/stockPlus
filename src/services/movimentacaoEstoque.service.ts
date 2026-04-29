@@ -3,7 +3,7 @@ import { iMovimentacaoEstoque } from "../models/movimentacaoEstoque.model";
 
 export class MovimentacaoService {
 
-    constructor(private repo = new MovimentacaoRepository()) { }
+    constructor(private repository = new MovimentacaoRepository()) { }
 
     async criar(dados: iMovimentacaoEstoque): Promise<number> {
 
@@ -26,15 +26,15 @@ export class MovimentacaoService {
         // Ao inserir uma movimentação, o estoque é atualizado automaticamente
         // por uma trigger no banco de dados
 
-        return await this.repo.insert(dados);
+        return await this.repository.insert(dados);
     }
 
     async listar(): Promise<iMovimentacaoEstoque[]> {
-        return await this.repo.selectAll();
+        return await this.repository.selectAll();
     }
 
     async buscarPorId(id: number) {
-        const result = await this.repo.selectById(id);
+        const result = await this.repository.selectById(id);
         if (!result) {
             throw new Error("Movimentação não encontrada");
         }
