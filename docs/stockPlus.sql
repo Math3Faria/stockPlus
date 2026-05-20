@@ -75,14 +75,25 @@ BEGIN
         SET qtdAtual = qtdAtual + NEW.quantidade
         WHERE idProduto = NEW.idProduto;
 
-        INSERT INTO Lotes
-        (idProduto, quantidadeEntrada, dataValidade)
-        VALUES
-        (
-            NEW.idProduto,
-            NEW.quantidade,
-            NEW.dataValidade
-        );
+
+        IF NEW.dataValidade IS NOT NULL
+        AND NEW.descricao IS NOT NULL
+        AND LOWER(NEW.descricao) LIKE '%lote%' THEN
+
+            INSERT INTO Lotes
+            (
+                idProduto,
+                quantidadeEntrada,
+                dataValidade
+            )
+            VALUES
+            (
+                NEW.idProduto,
+                NEW.quantidade,
+                NEW.dataValidade
+            );
+
+        END IF;
 
     ELSEIF NEW.tipo = 'SAIDA' THEN
 
