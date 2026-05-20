@@ -11,7 +11,7 @@ export class MovimentacaoController {
 
       return res.status(201).json({
         message: "Movimentação criada com sucesso",
-        data: result
+        idMovimentacao: result
       });
 
     } catch (error: unknown) {
@@ -31,14 +31,26 @@ export class MovimentacaoController {
 
   listar = async (req: Request, res: Response) => {
     try{
-    const dados = await this.service.listar();
-    const idMovimentacao = req.query.idMovimentacao;
-            
-            if (idMovimentacao) {
-                const result = await this.service.buscarPorId(Number(idMovimentacao));
-                return res.status(200).json({ movimentacoes: result });
-            }
-      return res.json({ movimentacoes: dados });
+    
+      const idMovimentacao = req.query.idMovimentacao;
+
+      if (idMovimentacao) {
+
+        const result = await this.service.buscarPorId(
+          Number(idMovimentacao)
+        );
+
+        return res.status(200).json({
+          movimentacao: result
+        });
+      }
+
+      const dados = await this.service.listar();
+
+      return res.status(200).json({
+        movimentacoes: dados
+      });
+
 
     } catch (error: unknown) {
             console.error(error);

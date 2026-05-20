@@ -46,6 +46,7 @@ create table if not exists Estoque(
 );
 
 create table if not exists MovimentacaoEstoque(
+<<<<<<< HEAD
     idMovimentacao int auto_increment primary key,
     idProduto int not null,
     tipo VARCHAR(20) not null,
@@ -54,6 +55,16 @@ create table if not exists MovimentacaoEstoque(
     descricao varchar(150) null,
     dataMovimentacao timestamp default current_timestamp,
     foreign key (idProduto) references Produtos(idProduto)
+=======
+idMovimentacao int auto_increment primary key,
+idProduto int not null,
+tipo VARCHAR(20) not null,
+quantidade int not null,
+dataValidade date null,
+descricao varchar(150) null,
+dataMovimentacao timestamp default current_timestamp,
+foreign key (idProduto) references Produtos(idProduto)
+>>>>>>> lucas_ferreira1
 );
 
 create table if not exists Lotes(
@@ -76,14 +87,58 @@ create table if not exists Alerta (
 );
 
 DELIMITER $$
+<<<<<<< HEAD
 CREATE PROCEDURE proc_verificar_vencimento()
 BEGIN 
     SELECT idProduto, quantidadeEntrada, dataValidade, DATEDIFF(dataValidade, CURDATE()) AS dias_para_vencer 
     FROM Lotes 
     WHERE DATEDIFF(dataValidade, CURDATE()) = 45 OR DATEDIFF(dataValidade, CURDATE()) = 90; 
+=======
+
+CREATE TRIGGER trg_atualizar_estoque
+AFTER INSERT ON MovimentacaoEstoque
+FOR EACH ROW
+BEGIN
+
+    IF NEW.tipo = 'ENTRADA' THEN
+
+        UPDATE Estoque
+        SET qtdAtual = qtdAtual + NEW.quantidade
+        WHERE idProduto = NEW.idProduto;
+
+
+        IF NEW.dataValidade IS NOT NULL
+        AND NEW.descricao IS NOT NULL
+        AND LOWER(NEW.descricao) LIKE '%lote%' THEN
+
+            INSERT INTO Lotes
+            (
+                idProduto,
+                quantidadeEntrada,
+                dataValidade
+            )
+            VALUES
+            (
+                NEW.idProduto,
+                NEW.quantidade,
+                NEW.dataValidade
+            );
+
+        END IF;
+
+    ELSEIF NEW.tipo = 'SAIDA' THEN
+
+        UPDATE Estoque
+        SET qtdAtual = qtdAtual - NEW.quantidade
+        WHERE idProduto = NEW.idProduto;
+
+    END IF;
+
+>>>>>>> lucas_ferreira1
 END$$
 DELIMITER ;
 
+<<<<<<< HEAD
 DELIMITER $$
 CREATE TRIGGER trg_atualizar_estoque AFTER INSERT ON MovimentacaoEstoque FOR EACH ROW BEGIN IF NEW.tipo = 'ENTRADA' THEN UPDATE Estoque SET qtdAtual = qtdAtual + NEW.quantidade WHERE idProduto = NEW.idProduto; IF NEW.dataValidade IS NOT NULL AND NEW.descricao IS NOT NULL AND LOWER(NEW.descricao) LIKE '%lote%' THEN INSERT INTO Lotes (idProduto, quantidadeEntrada, dataValidade) VALUES (NEW.idProduto, NEW.quantidade, NEW.dataValidade); END IF; ELSEIF NEW.tipo = 'SAIDA' THEN UPDATE Estoque SET qtdAtual = qtdAtual - NEW.quantidade WHERE idProduto = NEW.idProduto; END IF; END$$
 DELIMITER ;
@@ -112,3 +167,8 @@ DO CALL sp_gerarAlertas();
 
 CALL sp_gerarAlertas();
 SELECT * FROM Alerta
+=======
+DELIMITER ;
+
+
+>>>>>>> lucas_ferreira1

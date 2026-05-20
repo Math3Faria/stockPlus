@@ -5,8 +5,8 @@ import { ResultSetHeader } from "mysql2";
 export class MovimentacaoRepository {
 
   async insert(dados: iMovimentacaoEstoque): Promise<number> {
-    const sql = `INSERT INTO MovimentacaoEstoque (idProduto, tipo, quantidade)VALUES (?, ?, ?)`;
-    const values = [dados.idProduto, dados.tipo, dados.quantidade];
+    const sql = `INSERT INTO MovimentacaoEstoque(idProduto, tipo, quantidade, dataValidade, descricao)VALUES (?, ?, ?, ?, ?)`;
+    const values = [dados.idProduto, dados.tipo, dados.quantidade, dados.dataValidade ?? null, dados.descricao ?? null];
     const [rows] = await db.execute<ResultSetHeader>(sql, values);
     return rows.insertId;
   }
@@ -18,7 +18,7 @@ export class MovimentacaoRepository {
   }
 
   async selectById(id: number): Promise<iMovimentacaoEstoque | null> {
-    const sql =  "SELECT * FROM MovimentacaoEstoque WHERE idMovimentacao = ?;";
+    const sql = "SELECT * FROM MovimentacaoEstoque WHERE idMovimentacao = ?;";
     const values = [id];
     const [rows] = await db.execute<iMovimentacaoEstoque[]>(sql, values);
     return rows[0];
