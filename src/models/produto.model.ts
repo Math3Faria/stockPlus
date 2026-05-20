@@ -7,6 +7,9 @@ export interface IProduto extends RowDataPacket {
     idCategoria: number;
     idFornecedor: number;
     imagemProduto: string;
+    quantidade: number;
+    qtdMax: number;
+    qtdMin: number;
     dataCad: Date;
 }
 
@@ -16,6 +19,9 @@ export interface IProdutoCreate {
     idCategoria: number;
     idFornecedor: number;
     imagemProduto: string;
+    quantidade: number;
+    qtdMax: number;
+    qtdMin: number;
 }
 
 export class Produto {
@@ -25,24 +31,23 @@ export class Produto {
     private _idCategoria: number;
     private _idFornecedor: number;
     private _imagemProduto: string;
+    private _quantidade: number;
+    private _qtdMax: number;
+    private _qtdMin: number;
 
-    constructor(
-        nomeProduto: string,
-        valor: number,
-        idCategoria: number,
-        idFornecedor: number,
-        imagemProduto: string,
-        idProduto?: number
-    ) {
-        this._validarNome(nomeProduto);
-
+    constructor(nomeProduto: string, valor: number, idCategoria: number, idFornecedor: number, imagemProduto: string, quantidade: number, qtdMax: number, qtdMin: number, idProduto?: number) {
         if (valor <= 0) throw new Error("Valor deve ser maior que zero");
-
+        if (quantidade < 0) throw new Error("Quantidade não pode ser negativa");
+        if (qtdMax < 0 || qtdMin < 0) throw new Error("Limites de estoque não podem ser negativos");
+        if (qtdMin > qtdMax) throw new Error("Quantidade mínima não pode ser maior que a máxima");
         this._nomeProduto = nomeProduto;
         this._valor = valor;
         this._idCategoria = idCategoria;
         this._idFornecedor = idFornecedor;
         this._imagemProduto = imagemProduto;
+        this._quantidade = quantidade;
+        this._qtdMax = qtdMax;
+        this._qtdMin = qtdMin;
         this._idProduto = idProduto;
     }
 
@@ -52,32 +57,15 @@ export class Produto {
     get idCategoria() { return this._idCategoria; }
     get idFornecedor() { return this._idFornecedor; }
     get imagemProduto() { return this._imagemProduto; }
+    get quantidade() { return this._quantidade; }
+    get qtdMax() { return this._qtdMax; }
+    get qtdMin() { return this._qtdMin; }
 
-
-    static criar(
-        nomeProduto: string,
-        valor: number,
-        idCategoria: number,
-        idFornecedor: number,
-        imagemProduto: string
-    ) {
-        return new Produto(nomeProduto, valor, idCategoria, idFornecedor, imagemProduto);
+    static criar(nomeProduto: string, valor: number, idCategoria: number, idFornecedor: number, imagemProduto: string, quantidade: number, qtdMax: number, qtdMin: number) {
+        return new Produto(nomeProduto, valor, idCategoria, idFornecedor, imagemProduto, quantidade, qtdMax, qtdMin);
     }
 
-    static editar(
-        idProduto: number,
-        nomeProduto: string,
-        valor: number,
-        idCategoria: number,
-        idFornecedor: number,
-        imagemProduto: string
-    ) {
-        return new Produto(nomeProduto, valor, idCategoria, idFornecedor, imagemProduto, idProduto);
-    }
-
-    private _validarNome(nome: string) {
-        if (!nome || nome.length < 3) {
-            throw new Error("Nome deve ter pelo menos 3 caracteres");
-        }
+    static editar(idProduto: number, nomeProduto: string, valor: number, idCategoria: number, idFornecedor: number, imagemProduto: string, quantidade: number, qtdMax: number, qtdMin: number) {
+        return new Produto(nomeProduto, valor, idCategoria, idFornecedor, imagemProduto, quantidade, qtdMax, qtdMin, idProduto);
     }
 }
