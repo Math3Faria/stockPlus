@@ -1,11 +1,10 @@
 import { Router } from "express";
 import { MovimentacaoController } from "../controllers/movimentacaoEstoque.controller";
 
-const movimentacaoRouter = Router();
 const movimentacaoController = new MovimentacaoController();
+const movimentacaoRoutes = Router();
 
-movimentacaoRouter.post("/movimentacoes", movimentacaoController.criar);
-movimentacaoRouter.get("/movimentacoes", movimentacaoController.listar);
-movimentacaoRouter.get("/movimentacoes/:id", movimentacaoController.buscarPorId);
+movimentacaoRoutes.post("/movimentacoes", movimentacaoController.criar);
+movimentacaoRoutes.get("/movimentacoes", movimentacaoController.listar);
 
-export default movimentacaoRouter;
+export default movimentacaoRoutes;

@@ -3,7 +3,7 @@ import { RowDataPacket } from "mysql2";
 export interface iMovimentacaoEstoque extends RowDataPacket {
   idMovimentacao?: number;
   idProduto: number;
-  tipo: "ENTRADA" | "SAIDA" | "AJUSTE";
+  tipo: "ENTRADA" | "SAIDA";
   quantidade: number;
   dataMovimentacao?: Date;
 }
@@ -27,7 +27,7 @@ export class MovimentacaoEstoque {
   get Quantidade() { return this._quantidade; }
 
   set Tipo(value: string) {
-    const tiposValidos = ["ENTRADA", "SAIDA", "AJUSTE"];
+    const tiposValidos = ["ENTRADA", "SAIDA"];
     if (!tiposValidos.includes(value)) {
       throw new Error("Tipo inválido");
     }
