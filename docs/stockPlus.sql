@@ -69,27 +69,28 @@ AFTER INSERT ON MovimentacaoEstoque
 FOR EACH ROW
 BEGIN
 
-  DECLARE existe INT;
+    IF NEW.tipo = 'ENTRADA' THEN
 
-  SELECT COUNT(*) INTO existe
-  FROM Estoque
-  WHERE idProduto = NEW.idProduto;
+        UPDATE Estoque
+        SET qtdAtual = qtdAtual + NEW.quantidade
+        WHERE idProduto = NEW.idProduto;
 
-  IF existe = 0 THEN
-    INSERT INTO Estoque (idProduto, qtdAtual, qtdMinima, qtdMaxima)
-    VALUES (NEW.idProduto, 0, 0, 0);
-  END IF;
+        INSERT INTO Lotes
+        (idProduto, quantidadeEntrada, dataValidade)
+        VALUES
+        (
+            NEW.idProduto,
+            NEW.quantidade,
+            NEW.dataValidade
+        );
 
-  IF NEW.tipo = 'ENTRADA' THEN
-    UPDATE Estoque
-    SET qtdAtual = qtdAtual + NEW.quantidade
-    WHERE idProduto = NEW.idProduto;
+    ELSEIF NEW.tipo = 'SAIDA' THEN
 
-  ELSEIF NEW.tipo = 'SAIDA' THEN
-    UPDATE Estoque
-    SET qtdAtual = qtdAtual - NEW.quantidade
-    WHERE idProduto = NEW.idProduto;
-  END IF;
+        UPDATE Estoque
+        SET qtdAtual = qtdAtual - NEW.quantidade
+        WHERE idProduto = NEW.idProduto;
+
+    END IF;
 
 END$$
 
