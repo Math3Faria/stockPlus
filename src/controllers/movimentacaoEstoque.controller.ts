@@ -29,7 +29,7 @@ export class MovimentacaoController {
         }
   };
 
-  listartudo = async (req: Request, res: Response) => {
+  listar = async (req: Request, res: Response) => {
     try{
     const dados = await this.service.listar();
     const idMovimentacao = req.query.idMovimentacao;
