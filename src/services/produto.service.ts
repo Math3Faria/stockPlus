@@ -2,6 +2,8 @@ import { ProdutoRepository } from "../repository/produto.repository";
 import { EstoqueRepository } from "../repository/estoque.repository";
 import { LotesRepository } from "../repository/lotes.repository";
 import { Produto } from "../models/produto.model";
+import fs from "fs";
+import path from "path";
 
 export class ProdutoService {
     constructor(
@@ -29,7 +31,14 @@ export class ProdutoService {
     }
 
     async deletar(idProduto: number) {
-        return this._repository.delete(idProduto);
+        const produtoExistente = await this._repository.findById(idProduto);
+        if (!produtoExistente) return { affectedRows: 0 };
+        const resultadoExclusao = await this._repository.delete(idProduto);
+        if (resultadoExclusao.affectedRows > 0 && produtoExistente.imagemProduto) {
+            const caminhoImagem = path.resolve(__dirname, "../../uploads", produtoExistente.imagemProduto);
+            if (fs.existsSync(caminhoImagem)) fs.unlinkSync(caminhoImagem);
+        }
+        return resultadoExclusao;
     }
 
     async selecionaById(idProduto: number) {
