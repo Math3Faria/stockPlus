@@ -47,6 +47,8 @@ idMovimentacao int auto_increment primary key,
 idProduto int not null,
 tipo VARCHAR(20) not null,
 quantidade int not null,
+dataValidade date null,
+descricao varchar(150) null,
 dataMovimentacao timestamp default current_timestamp,
 foreign key (idProduto) references Produtos(idProduto)
 );
@@ -106,3 +108,4 @@ BEGIN
 END$$
 
 DELIMITER ;
+
