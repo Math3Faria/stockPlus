@@ -8,14 +8,14 @@ export class ProdutoService {
         return this._repository.findAll();
     }
 
-    async criar(nomeProduto: string, valor: number, idCategoria: number, idFornecedor: number, imagemProduto: string, quantidade: number, qtdMax: number, qtdMin: number) {
-        const produto = Produto.criar(nomeProduto, valor, idCategoria, idFornecedor, imagemProduto, quantidade, qtdMax, qtdMin);
-        return this._repository.create({ nomeProduto: produto.nomeProduto, valor: produto.valor, idCategoria: produto.idCategoria, idFornecedor: produto.idFornecedor, imagemProduto: produto.imagemProduto, quantidade: produto.quantidade, qtdMax: produto.qtdMax, qtdMin: produto.qtdMin });
+    async criar(nomeProduto: string, valor: number, idCategoria: number, idFornecedor: number, imagemProduto: string, quantidade: number, qtdMax: number, qtdMin: number, dataVencimento: Date) {
+        const produto = Produto.criar(nomeProduto, valor, idCategoria, idFornecedor, imagemProduto, quantidade, qtdMax, qtdMin, dataVencimento);
+        return this._repository.create({ nomeProduto: produto.nomeProduto, valor: produto.valor, idCategoria: produto.idCategoria, idFornecedor: produto.idFornecedor, imagemProduto: produto.imagemProduto, quantidade: produto.quantidade, qtdMax: produto.qtdMax, qtdMin: produto.qtdMin, dataVencimento: produto.dataVencimento });
     }
 
-    async editar(idProduto: number, nomeProduto: string, valor: number, idCategoria: number, idFornecedor: number, imagemProduto: string, quantidade: number, qtdMax: number, qtdMin: number) {
-        const produto = Produto.editar(idProduto, nomeProduto, valor, idCategoria, idFornecedor, imagemProduto, quantidade, qtdMax, qtdMin);
-        return this._repository.update(idProduto, { nomeProduto: produto.nomeProduto, valor: produto.valor, idCategoria: produto.idCategoria, idFornecedor: produto.idFornecedor, imagemProduto: produto.imagemProduto, quantidade: produto.quantidade, qtdMax: produto.qtdMax, qtdMin: produto.qtdMin });
+    async editar(idProduto: number, nomeProduto: string, valor: number, idCategoria: number, idFornecedor: number, imagemProduto: string, quantidade: number, qtdMax: number, qtdMin: number, dataVencimento: Date) {
+        const produto = Produto.editar(idProduto, nomeProduto, valor, idCategoria, idFornecedor, imagemProduto, quantidade, qtdMax, qtdMin, dataVencimento);
+        return this._repository.update(idProduto, { nomeProduto: produto.nomeProduto, valor: produto.valor, idCategoria: produto.idCategoria, idFornecedor: produto.idFornecedor, imagemProduto: produto.imagemProduto, quantidade: produto.quantidade, qtdMax: produto.qtdMax, qtdMin: produto.qtdMin, dataVencimento: produto.dataVencimento });
     }
 
     async deletar(idProduto: number) {
