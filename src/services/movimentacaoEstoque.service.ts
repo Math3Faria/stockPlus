@@ -42,17 +42,6 @@ export class MovimentacaoService {
             );
         }
 
-        // Regra da validade
-
-        if (
-            dados.tipo === "ENTRADA" &&
-            !dados.dataValidade
-        ) {
-            throw new Error(
-                "Data de validade obrigatória para ENTRADA"
-            );
-        }
-
         // Validação descrição
 
         if (
