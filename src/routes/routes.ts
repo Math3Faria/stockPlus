@@ -5,9 +5,11 @@ import fornecedorRoutes from "./fornecedores.routes";
 import lotesRoutes from "./lotes.routes";
 import movimentacaoRouter from "./movimentacaoEstoque.routes";
 import produtoRoutes from "./produto.routes";
+import alertaRoutes from "./alerta.routes";
 
 const router = Router();
 
+router.use('/', alertaRoutes)
 router.use('/', categoriaRoutes);
 router.use('/', estoqueRoutes);
 router.use('/', fornecedorRoutes);
