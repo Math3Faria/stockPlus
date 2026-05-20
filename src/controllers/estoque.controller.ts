@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { EstoqueService } from "../services/estoque.service";
 
 export class EstoqueController {
-    constructor(private _service = new EstoqueService()) {}
+    constructor(private _service = new EstoqueService()) { }
 
     selecionarTodos = async (req: Request, res: Response) => {
         try {
@@ -25,29 +25,15 @@ export class EstoqueController {
     criar = async (req: Request, res: Response) => {
         try {
             const {
-                idProduto,
-                qtdAtual,
-                qtdMinima,
-                qtdMaxima
-            } = req.body;
+                idProduto, qtdAtual, qtdMinima, qtdMaxima } = req.body;
 
-            if (
-                !idProduto ||
-                !qtdAtual ||
-                !qtdMinima ||
-                !qtdMaxima
-            ) {
+            if (!idProduto || !qtdAtual || !qtdMinima || !qtdMaxima) {
                 return res.status(400).json({
                     message: "Preencha todos os campos"
                 });
             }
 
-            const novo = await this._service.criar(
-                Number(idProduto),
-                Number(qtdAtual),
-                Number(qtdMinima),
-                Number(qtdMaxima)
-            );
+            const novo = await this._service.criar(Number(idProduto), Number(qtdAtual), Number(qtdMinima), Number(qtdMaxima));
 
             return res.status(201).json({ novo });
         } catch (error: unknown) {
@@ -56,9 +42,7 @@ export class EstoqueController {
             return res.status(500).json({
                 message: "Erro no servidor",
                 errorMessage:
-                    error instanceof Error
-                        ? error.message
-                        : "Erro desconhecido"
+                    error instanceof Error ? error.message : "Erro desconhecido"
             });
         }
     };
@@ -67,12 +51,7 @@ export class EstoqueController {
         try {
             const idEstoque = Number(req.params.id);
 
-            const {
-                idProduto,
-                qtdAtual,
-                qtdMinima,
-                qtdMaxima
-            } = req.body;
+            const {idProduto,qtdAtual,qtdMinima,qtdMaxima} = req.body;
 
             if (!idEstoque || isNaN(idEstoque)) {
                 return res.status(400).json({
@@ -80,17 +59,11 @@ export class EstoqueController {
                 });
             }
 
-            const alterado = await this._service.editar(
-                idEstoque,
-                Number(idProduto),
-                Number(qtdAtual),
-                Number(qtdMinima),
-                Number(qtdMaxima)
-            );
+            const alterado = await this._service.editar(idEstoque,Number(idProduto),Number(qtdAtual),Number(qtdMinima),Number(qtdMaxima) );
 
             return res.status(200).json({ alterado });
         } catch (error: unknown) {
-            console.error(error);
+            console.error(error); 
 
             return res.status(500).json({
                 message: "Erro no servidor",
@@ -115,8 +88,7 @@ export class EstoqueController {
             const deletado = await this._service.deletar(idEstoque);
 
             return res.status(200).json({
-                message: "Excluído com sucesso",
-                deletado
+                message: "Excluído com sucesso",deletado
             });
         } catch (error: unknown) {
             console.error(error);

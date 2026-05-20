@@ -75,7 +75,6 @@ BEGIN
   FROM Estoque
   WHERE idProduto = NEW.idProduto;
 
-  -- cria estoque se não existir (entrada/ajuste)
   IF existe = 0 THEN
     INSERT INTO Estoque (idProduto, qtdAtual, qtdMinima, qtdMaxima)
     VALUES (NEW.idProduto, 0, 0, 0);

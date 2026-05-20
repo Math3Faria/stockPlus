@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { ProdutoService } from "../services/produto.service";
 
 export class ProdutoController {
-    constructor(private _service = new ProdutoService()) {}
+    constructor(private _service = new ProdutoService()) { }
 
     selecionarTodos = async (req: Request, res: Response) => {
         try {
@@ -39,13 +39,7 @@ export class ProdutoController {
                 });
             }
 
-            const novo = await this._service.criar(
-                nomeProduto,
-                valorNum,
-                idCategoriaNum,
-                idFornecedorNum,
-                imagemProduto
-            );
+            const novo = await this._service.criar(nomeProduto, valorNum, idCategoriaNum, idFornecedorNum, imagemProduto);
 
             return res.status(201).json({ novo });
 
@@ -80,14 +74,7 @@ export class ProdutoController {
 
             const imagemProduto = req.file?.filename || req.body.imagemProduto;
 
-            const alterado = await this._service.editar(
-                idProduto,
-                nomeProduto,
-                valorNum,
-                idCategoriaNum,
-                idFornecedorNum,
-                imagemProduto
-            );
+            const alterado = await this._service.editar(idProduto, nomeProduto, valorNum, idCategoriaNum, idFornecedorNum, imagemProduto );
 
             return res.status(200).json({ alterado });
 
@@ -163,18 +150,6 @@ export class ProdutoController {
 
             return res.status(200).json({ produtos });
 
-        } catch (error: unknown) {
-            console.error(error);
-            return res.status(500).json({
-                message: "Erro no servidor"
-            });
-        }
-    };
-
-    selecionarAlfabeto = async (req: Request, res: Response) => {
-        try {
-            const produtos = await this._service.selecionaAbc();
-            return res.status(200).json({ produtos });
         } catch (error: unknown) {
             console.error(error);
             return res.status(500).json({
