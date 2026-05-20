@@ -5,6 +5,8 @@ export interface iMovimentacaoEstoque extends RowDataPacket {
   idProduto: number;
   tipo: "ENTRADA" | "SAIDA";
   quantidade: number;
+  dataValidade: Date | null;
+  descricao?: string | null;
   dataMovimentacao?: Date;
 }
 
@@ -13,11 +15,22 @@ export class MovimentacaoEstoque {
   private _idProduto!: number;
   private _tipo!: string;
   private _quantidade!: number;
+  private _dataValidade: Date | null = null;
+  private _descricao: string | null = null;
 
-  constructor(idProduto: number, tipo: string, quantidade: number, id?: number) {
+  constructor(
+    idProduto: number,
+    tipo: string,
+    quantidade: number,
+    dataValidade?: Date | null,
+    descricao?: string | null,
+    id?: number
+){
     this._idProduto = idProduto;
-    this.Tipo = tipo;
-    this.Quantidade = quantidade;
+    this._tipo = tipo;
+    this._quantidade = quantidade;
+    this._dataValidade = dataValidade ?? null;
+    this._descricao = descricao ?? null;
     this._id = id;
   }
 
@@ -25,6 +38,8 @@ export class MovimentacaoEstoque {
   get IdProduto() { return this._idProduto; }
   get Tipo() { return this._tipo; }
   get Quantidade() { return this._quantidade; }
+  get DataValidade() { return this._dataValidade; }
+  get Descricao() { return this._descricao; }
 
   set Tipo(value: string) {
     const tiposValidos = ["ENTRADA", "SAIDA"];
@@ -39,5 +54,20 @@ export class MovimentacaoEstoque {
       throw new Error("Quantidade deve ser maior que zero");
     }
     this._quantidade = value;
+  }
+
+  set DataValidade(value: Date | null) {
+
+    if (this._tipo === "ENTRADA" && !value) {
+      throw new Error(
+        "Data de validade é obrigatória para entradas."
+      );
+    }
+
+    this._dataValidade = value;
+  }
+
+  set Descricao(value: string | null) {
+    this._descricao = value;
   }
 }

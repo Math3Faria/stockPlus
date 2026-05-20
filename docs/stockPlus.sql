@@ -50,6 +50,8 @@ idMovimentacao int auto_increment primary key,
 idProduto int not null,
 tipo VARCHAR(20) not null,
 quantidade int not null,
+dataValidade date null,
+descricao varchar(150) null,
 dataMovimentacao timestamp default current_timestamp,
 foreign key (idProduto) references Produtos(idProduto)
 );
@@ -72,36 +74,42 @@ AFTER INSERT ON MovimentacaoEstoque
 FOR EACH ROW
 BEGIN
 
-  DECLARE existe INT;
+    IF NEW.tipo = 'ENTRADA' THEN
 
-  SELECT COUNT(*) INTO existe
-  FROM Estoque
-  WHERE idProduto = NEW.idProduto;
+        UPDATE Estoque
+        SET qtdAtual = qtdAtual + NEW.quantidade
+        WHERE idProduto = NEW.idProduto;
 
-  -- cria estoque se não existir (entrada/ajuste)
-  IF existe = 0 THEN
-    INSERT INTO Estoque (idProduto, qtdAtual, qtdMinima, qtdMaxima)
-    VALUES (NEW.idProduto, 0, 0, 0);
-  END IF;
 
-  -- ENTRADA
-  IF NEW.tipo = 'ENTRADA' THEN
-    UPDATE Estoque
-    SET qtdAtual = qtdAtual + NEW.quantidade
-    WHERE idProduto = NEW.idProduto;
+        IF NEW.dataValidade IS NOT NULL
+        AND NEW.descricao IS NOT NULL
+        AND LOWER(NEW.descricao) LIKE '%lote%' THEN
 
-  -- SAIDA
-  ELSEIF NEW.tipo = 'SAIDA' THEN
-    UPDATE Estoque
-    SET qtdAtual = qtdAtual - NEW.quantidade
-    WHERE idProduto = NEW.idProduto;
+            INSERT INTO Lotes
+            (
+                idProduto,
+                quantidadeEntrada,
+                dataValidade
+            )
+            VALUES
+            (
+                NEW.idProduto,
+                NEW.quantidade,
+                NEW.dataValidade
+            );
 
-  -- AJUSTE
-  ELSEIF NEW.tipo = 'AJUSTE' THEN
-    UPDATE Estoque
-    SET qtdAtual = qtdAtual + NEW.quantidade;
-  END IF;
+        END IF;
+
+    ELSEIF NEW.tipo = 'SAIDA' THEN
+
+        UPDATE Estoque
+        SET qtdAtual = qtdAtual - NEW.quantidade
+        WHERE idProduto = NEW.idProduto;
+
+    END IF;
 
 END$$
 
 DELIMITER ;
+
+
