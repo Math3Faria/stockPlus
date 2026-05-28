@@ -7,7 +7,7 @@ export class CategoriaController {
 
   selecionarTodos = async (req: Request, res: Response) => {
     try {
-      const idUsuarioLogado = req.user?.login_id; 
+      const idUsuarioLogado = (req as any).user?.login_id;
       if (!idUsuarioLogado) {
         return res.status(401).json({ message: "Usuário não autenticado." });
       }
@@ -43,7 +43,7 @@ export class CategoriaController {
 
   inserir = async (req: Request, res: Response) => {
     try {
-      const idUsuarioLogado = req.user?.login_id;
+      const idUsuarioLogado = (req as any).user?.login_id;
       if (!idUsuarioLogado) return res.status(401).json({ message: "Usuário não autenticado." });
 
       const { descricao } = req.body;
@@ -65,7 +65,7 @@ export class CategoriaController {
 
   atualizar = async (req: Request, res: Response) => {
     try {
-      const idUsuarioLogado = req.user?.login_id;
+      const idUsuarioLogado = (req as any).user?.login_id;
       if (!idUsuarioLogado) return res.status(401).json({ message: "Usuário não autenticado." });
 
       const id = Number(req.params.id);
@@ -94,7 +94,7 @@ export class CategoriaController {
 
   deletar = async (req: Request, res: Response) => {
     try {
-      const idUsuarioLogado = req.user?.login_id;
+      const idUsuarioLogado = (req as any).user?.login_id;
       if (!idUsuarioLogado) return res.status(401).json({ message: "Usuário não autenticado." });
 
       const id = Number(req.params.id);

@@ -7,7 +7,7 @@ export class AlertaController {
 
   selecionarTodos = async (req: Request, res: Response) => {
     try {
-      const idUsuarioLogado = req.user?.login_id; 
+      const idUsuarioLogado = (req as any).user?.login_id;
       if (!idUsuarioLogado) {
         return res.status(401).json({ message: "Usuário não autenticado." });
       }

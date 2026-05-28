@@ -6,7 +6,7 @@ export class ProdutoController {
 
     selecionarTodos = async (req: Request, res: Response) => {
         try {
-            const idUsuarioLogado = req.user?.login_id; 
+            const idUsuarioLogado = (req as any).user?.login_id;
             if (!idUsuarioLogado) {
                 return res.status(401).json({ message: "Usuário não autenticado." });
             }
@@ -21,7 +21,7 @@ export class ProdutoController {
 
     criar = async (req: Request, res: Response) => {
         try {
-            const idUsuarioLogado = req.user?.login_id;
+            const idUsuarioLogado = (req as any).user?.login_id;
             if (!idUsuarioLogado) {
                 return res.status(401).json({ message: "Usuário não autenticado." });
             }
@@ -44,7 +44,7 @@ export class ProdutoController {
 
     editar = async (req: Request, res: Response) => {
         try {
-            const idUsuarioLogado = req.user?.login_id;
+            const idUsuarioLogado = (req as any).user?.login_id;
             if (!idUsuarioLogado) {
                 return res.status(401).json({ message: "Usuário não autenticado." });
             }
@@ -74,7 +74,7 @@ export class ProdutoController {
 
     deletar = async (req: Request, res: Response) => {
         try {
-            const idUsuarioLogado = req.user?.login_id;
+            const idUsuarioLogado = (req as any).user?.login_id;
             if (!idUsuarioLogado) {
                 return res.status(401).json({ message: "Usuário não autenticado." });
             }
@@ -105,7 +105,7 @@ export class ProdutoController {
 
     selecionaById = async (req: Request, res: Response) => {
         try {
-            const idUsuarioLogado = req.user?.login_id;
+            const idUsuarioLogado = (req as any).user?.login_id;
             if (!idUsuarioLogado) {
                 return res.status(401).json({ message: "Usuário não autenticado." });
             }

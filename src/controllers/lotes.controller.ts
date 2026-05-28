@@ -6,7 +6,7 @@ export class LotesController {
 
     selecionarTodos = async (req: Request, res: Response) => {
         try {
-            const idUsuarioLogado = req.user?.login_id; 
+            const idUsuarioLogado = (req as any).user?.login_id;
             if (!idUsuarioLogado) {
                 return res.status(401).json({ message: "Usuário não autenticado." });
             }
@@ -29,7 +29,7 @@ export class LotesController {
 
     criar = async (req: Request, res: Response) => {
         try {
-            const idUsuarioLogado = req.user?.login_id;
+            const idUsuarioLogado = (req as any).user?.login_id;
             if (!idUsuarioLogado) {
                 return res.status(401).json({ message: "Usuário não autenticado." });
             }
@@ -65,7 +65,7 @@ export class LotesController {
 
     editar = async (req: Request, res: Response) => {
         try {
-            const idUsuarioLogado = req.user?.login_id;
+            const idUsuarioLogado = (req as any).user?.login_id;
             if (!idUsuarioLogado) {
                 return res.status(401).json({ message: "Usuário não autenticado." });
             }
@@ -108,7 +108,7 @@ export class LotesController {
 
     deletar = async (req: Request, res: Response) => {
         try {
-            const idUsuarioLogado = req.user?.login_id;
+            const idUsuarioLogado = (req as any).user?.login_id;
             if (!idUsuarioLogado) {
                 return res.status(401).json({ message: "Usuário não autenticado." });
             }
@@ -147,7 +147,7 @@ export class LotesController {
 
     selecionaById = async (req: Request, res: Response) => {
         try {
-            const idUsuarioLogado = req.user?.login_id;
+            const idUsuarioLogado = (req as any).user?.login_id;
             if (!idUsuarioLogado) {
                 return res.status(401).json({ message: "Usuário não autenticado." });
             }
