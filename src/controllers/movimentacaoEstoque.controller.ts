@@ -2,12 +2,14 @@ import { Request, Response } from "express";
 import { MovimentacaoService } from "../services/movimentacaoEstoque.service";
 
 export class MovimentacaoController {
-
-  constructor(private service = new MovimentacaoService()) {}
+  constructor(
+    private service = new MovimentacaoService()
+  ) {}
 
   criar = async (req: Request, res: Response) => {
     try {
       const idUsuarioLogado = (req as any).user?.login_id;
+      
       if (!idUsuarioLogado) {
         return res.status(401).json({ message: "Usuário não autenticado." });
       }
@@ -18,18 +20,24 @@ export class MovimentacaoController {
         message: "Movimentação criada com sucesso",
         idMovimentacao: result
       });
-
     } catch (error: unknown) {
       console.error(error);
       if (error instanceof Error) {
+        const errosValidacao = ["Produto obrigatório", "Tipo obrigatório", "Tipo inválido", "Quantidade inválida", "Descrição excede 150 caracteres"];
+        
+        if (errosValidacao.includes(error.message)) {
+          return res.status(400).json({ message: error.message });
+        }
+
         return res.status(500).json({
-          message: 'Ocorreu um erro no servidor',
+          message: "Ocorreu um erro no servidor",
           errorMessage: error.message
         });
       }
+
       return res.status(500).json({
-        message: 'Ocorreu um erro no servidor',
-        errorMessage: 'Erro desconhecido'
+        message: "Ocorreu um erro no servidor",
+        errorMessage: "Erro desconhecido"
       });
     }
   };
@@ -37,6 +45,7 @@ export class MovimentacaoController {
   listar = async (req: Request, res: Response) => {
     try {
       const idUsuarioLogado = (req as any).user?.login_id;
+      
       if (!idUsuarioLogado) {
         return res.status(401).json({ message: "Usuário não autenticado." });
       }
@@ -60,18 +69,19 @@ export class MovimentacaoController {
       return res.status(200).json({
         movimentacoes: dados
       });
-
     } catch (error: unknown) {
       console.error(error);
+      
       if (error instanceof Error) {
         return res.status(500).json({
-          message: 'Ocorreu um erro no servidor',
+          message: "Ocorreu um erro no servidor",
           errorMessage: error.message
         });
       }
+
       return res.status(500).json({
-        message: 'Ocorreu um erro no servidor',
-        errorMessage: 'Erro desconhecido'
+        message: "Ocorreu um erro no servidor",
+        errorMessage: "Erro desconhecido"
       });
     }
   };
