@@ -3,25 +3,27 @@ import { IEstoque } from "../models/estoque.model";
 import { ResultSetHeader } from "mysql2/promise";
 
 export class EstoqueRepository {
-    async findAll(): Promise<IEstoque[]> {
+    async findAll(idUsuarioLogado: number): Promise<IEstoque[]> {
         const [rows] = await db.execute<IEstoque[]>(
-            "SELECT * FROM Estoque;"
+            "SELECT * FROM Estoque WHERE login_id = ?;",
+            [idUsuarioLogado]
         );
         return rows;
     }
 
-    async create(dados: Omit<IEstoque, 'idEstoque'>): Promise<ResultSetHeader> {
+    async create(dados: Omit<IEstoque, 'idEstoque'>, idUsuarioLogado: number): Promise<ResultSetHeader> {
         const sql = `
             INSERT INTO Estoque
-            (idProduto, qtdAtual, qtdMinima, qtdMaxima)
-            VALUES (?, ?, ?, ?)
+            (idProduto, qtdAtual, qtdMinima, qtdMaxima, login_id)
+            VALUES (?, ?, ?, ?, ?)
         `;
 
         const values = [
             dados.idProduto,
             dados.qtdAtual,
             dados.qtdMinima,
-            dados.qtdMaxima
+            dados.qtdMaxima,
+            idUsuarioLogado
         ];
 
         const [rows] = await db.execute<ResultSetHeader>(sql, values);
@@ -30,12 +32,13 @@ export class EstoqueRepository {
 
     async update(
         idEstoque: number,
-        dados: Omit<IEstoque, 'idEstoque'>
+        dados: Omit<IEstoque, 'idEstoque'>,
+        idUsuarioLogado: number
     ): Promise<ResultSetHeader> {
         const sql = `
             UPDATE Estoque
             SET idProduto = ?, qtdAtual = ?, qtdMinima = ?, qtdMaxima = ?
-            WHERE idEstoque = ?
+            WHERE idEstoque = ? AND login_id = ?
         `;
 
         const values = [
@@ -43,22 +46,23 @@ export class EstoqueRepository {
             dados.qtdAtual,
             dados.qtdMinima,
             dados.qtdMaxima,
-            idEstoque
+            idEstoque,
+            idUsuarioLogado
         ];
 
         const [rows] = await db.execute<ResultSetHeader>(sql, values);
         return rows;
     }
 
-    async delete(idEstoque: number): Promise<ResultSetHeader> {
-        const sql = "DELETE FROM Estoque WHERE idEstoque = ?;";
-        const [rows] = await db.execute<ResultSetHeader>(sql, [idEstoque]);
+    async delete(idEstoque: number, idUsuarioLogado: number): Promise<ResultSetHeader> {
+        const sql = "DELETE FROM Estoque WHERE idEstoque = ? AND login_id = ?;";
+        const [rows] = await db.execute<ResultSetHeader>(sql, [idEstoque, idUsuarioLogado]);
         return rows;
     }
 
-    async findById(idEstoque: number): Promise<IEstoque | undefined> {
-        const sql = "SELECT * FROM Estoque WHERE idEstoque = ?;";
-        const [rows] = await db.execute<IEstoque[]>(sql, [idEstoque]);
+    async findById(idEstoque: number, idUsuarioLogado: number): Promise<IEstoque | undefined> {
+        const sql = "SELECT * FROM Estoque WHERE idEstoque = ? AND login_id = ?;";
+        const [rows] = await db.execute<IEstoque[]>(sql, [idEstoque, idUsuarioLogado]);
         return rows[0];
     }
 }

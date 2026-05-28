@@ -7,6 +7,11 @@ export class FornecedorController {
 
   selecionarTodos = async (req: Request, res: Response) => {
     try {
+      const idUsuarioLogado = req.user?.login_id; 
+      if (!idUsuarioLogado) {
+        return res.status(401).json({ message: "Usuário não autenticado." });
+      }
+
       const { id } = req.params;
 
       if (id) {
@@ -16,16 +21,16 @@ export class FornecedorController {
           return res.status(400).json({ message: "ID inválido" });
         }
 
-        const fornecedor = await this.service.selecionarPorId(idConvertido);
+        const fornecedor = await this.service.selecionarPorId(idConvertido, idUsuarioLogado);
 
         if (!fornecedor) {
-          return res.status(404).json({ message: "Fornecedor não encontrada" });
+          return res.status(404).json({ message: "Fornecedor não encontrada ou você não tem permissão" });
         }
 
         return res.status(200).json(fornecedor);
       }
 
-      const fornecedores = await this.service.selecionarTodos();
+      const fornecedores = await this.service.selecionarTodos(idUsuarioLogado);
       return res.status(200).json(fornecedores);
 
     } catch (error) {
@@ -38,9 +43,12 @@ export class FornecedorController {
 
   inserir = async (req: Request, res: Response) => {
     try {
+      const idUsuarioLogado = req.user?.login_id;
+      if (!idUsuarioLogado) return res.status(401).json({ message: "Usuário não autenticado." });
+
       const { empresa, email, cnpj } = req.body;
 
-      const id = await this.service.inserir(empresa, email, cnpj);
+      const id = await this.service.inserir(empresa, email, cnpj, idUsuarioLogado);
 
       return res.status(201).json({
         message: "Fornecedor criado com sucesso",
@@ -57,6 +65,9 @@ export class FornecedorController {
 
   atualizar = async (req: Request, res: Response) => {
     try {
+      const idUsuarioLogado = req.user?.login_id;
+      if (!idUsuarioLogado) return res.status(401).json({ message: "Usuário não autenticado." });
+
       const id = Number(req.params.id);
       const { empresa, email, cnpj } = req.body;
 
@@ -64,7 +75,12 @@ export class FornecedorController {
         return res.status(400).json({ message: "ID inválido" });
       }
 
-      await this.service.atualizar(id, empresa, email, cnpj);
+      const fornecedorAtual = await this.service.selecionarPorId(id, idUsuarioLogado);
+      if (!fornecedorAtual) {
+        return res.status(403).json({ message: "Você não tem permissão para alterar este fornecedor" });
+      }
+
+      await this.service.atualizar(id, empresa, email, cnpj, idUsuarioLogado);
 
       return res.status(200).json({ message: "Forncedor atualizado com sucesso" });
 
@@ -78,13 +94,21 @@ export class FornecedorController {
 
   deletar = async (req: Request, res: Response) => {
     try {
+      const idUsuarioLogado = req.user?.login_id;
+      if (!idUsuarioLogado) return res.status(401).json({ message: "Usuário não autenticado." });
+
       const id = Number(req.params.id);
 
       if (isNaN(id)) {
         return res.status(400).json({ message: "ID inválido" });
       }
 
-      await this.service.deletar(id);
+      const fornecedorAtual = await this.service.selecionarPorId(id, idUsuarioLogado);
+      if (!fornecedorAtual) {
+        return res.status(403).json({ message: "Você não tem permissão para deletar este fornecedor" });
+      }
+
+      await this.service.deletar(id, idUsuarioLogado);
 
       return res.status(200).json({ message: "Fornecedor deletado com sucesso" });
 

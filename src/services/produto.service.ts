@@ -12,28 +12,63 @@ export class ProdutoService {
         private _lotesRepository = new LotesRepository()
     ) {}
 
-    async selecionarTodos() {
-        return this._repository.findAll();
+    async selecionarTodos(idUsuarioLogado: number) {
+        return this._repository.findAll(idUsuarioLogado);
     }
 
-    async criar(nomeProduto: string, valor: number, idCategoria: number, idFornecedor: number, imagemProduto: string, quantidade: number, qtdMax: number, qtdMin: number, dataVencimento: Date) {
+    async criar(nomeProduto: string, valor: number, idCategoria: number, idFornecedor: number, imagemProduto: string, quantidade: number, qtdMax: number, qtdMin: number, dataVencimento: Date, idUsuarioLogado: number) {
         const produto = Produto.criar(nomeProduto, valor, idCategoria, idFornecedor, imagemProduto, quantidade, qtdMax, qtdMin, dataVencimento);
-        const resultadoProduto = await this._repository.create({ nomeProduto: produto.nomeProduto, valor: produto.valor, idCategoria: produto.idCategoria, idFornecedor: produto.idFornecedor, imagemProduto: produto.imagemProduto, quantidade: produto.quantidade, qtdMax: produto.qtdMax, qtdMin: produto.qtdMin, dataVencimento: produto.dataVencimento });
+        
+        const resultadoProduto = await this._repository.create({ 
+            nomeProduto: produto.nomeProduto, 
+            valor: produto.valor, 
+            idCategoria: produto.idCategoria, 
+            idFornecedor: produto.idFornecedor, 
+            imagemProduto: produto.imagemProduto, 
+            quantidade: produto.quantidade, 
+            qtdMax: produto.qtdMax, 
+            qtdMin: produto.qtdMin, 
+            dataVencimento: produto.dataVencimento 
+        }, idUsuarioLogado);
+        
         const idNovoProduto = resultadoProduto.insertId;
-        await this._estoqueRepository.create({ idProduto: idNovoProduto, qtdAtual: produto.quantidade, qtdMinima: produto.qtdMin, qtdMaxima: produto.qtdMax });
-        await this._lotesRepository.create({ idProduto: idNovoProduto, quantidadeEntrada: produto.quantidade, dataValidade: produto.dataVencimento });
+        
+        await this._estoqueRepository.create({ 
+            idProduto: idNovoProduto, 
+            qtdAtual: produto.quantidade, 
+            qtdMinima: produto.qtdMin, 
+            qtdMaxima: produto.qtdMax 
+        }, idUsuarioLogado);
+        
+        await this._lotesRepository.create({ 
+            idProduto: idNovoProduto, 
+            quantidadeEntrada: produto.quantidade, 
+            dataValidade: produto.dataVencimento 
+        }, idUsuarioLogado);
+        
         return resultadoProduto;
     }
 
-    async editar(idProduto: number, nomeProduto: string, valor: number, idCategoria: number, idFornecedor: number, imagemProduto: string, quantidade: number, qtdMax: number, qtdMin: number, dataVencimento: Date) {
+    async editar(idProduto: number, nomeProduto: string, valor: number, idCategoria: number, idFornecedor: number, imagemProduto: string, quantidade: number, qtdMax: number, qtdMin: number, dataVencimento: Date, idUsuarioLogado: number) {
         const produto = Produto.editar(idProduto, nomeProduto, valor, idCategoria, idFornecedor, imagemProduto, quantidade, qtdMax, qtdMin, dataVencimento);
-        return this._repository.update(idProduto, { nomeProduto: produto.nomeProduto, valor: produto.valor, idCategoria: produto.idCategoria, idFornecedor: produto.idFornecedor, imagemProduto: produto.imagemProduto, quantidade: produto.quantidade, qtdMax: produto.qtdMax, qtdMin: produto.qtdMin, dataVencimento: produto.dataVencimento });
+        return this._repository.update(idProduto, { 
+            nomeProduto: produto.nomeProduto, 
+            valor: produto.valor, 
+            idCategoria: produto.idCategoria, 
+            idFornecedor: produto.idFornecedor, 
+            imagemProduto: produto.imagemProduto, 
+            quantidade: produto.quantidade, 
+            qtdMax: produto.qtdMax, 
+            qtdMin: produto.qtdMin, 
+            dataVencimento: produto.dataVencimento 
+        }, idUsuarioLogado);
     }
 
-    async deletar(idProduto: number) {
-        const produtoExistente = await this._repository.findById(idProduto);
+    async deletar(idProduto: number, idUsuarioLogado: number) {
+        const produtoExistente = await this._repository.findById(idProduto, idUsuarioLogado);
         if (!produtoExistente) return { affectedRows: 0 };
-        const resultadoExclusao = await this._repository.delete(idProduto);
+        
+        const resultadoExclusao = await this._repository.delete(idProduto, idUsuarioLogado);
         if (resultadoExclusao.affectedRows > 0 && produtoExistente.imagemProduto) {
             const caminhoImagem = path.resolve(__dirname, "../../uploads", produtoExistente.imagemProduto);
             if (fs.existsSync(caminhoImagem)) fs.unlinkSync(caminhoImagem);
@@ -41,7 +76,7 @@ export class ProdutoService {
         return resultadoExclusao;
     }
 
-    async selecionaById(idProduto: number) {
-        return this._repository.findById(idProduto);
+    async selecionaById(idProduto: number, idUsuarioLogado: number) {
+        return this._repository.findById(idProduto, idUsuarioLogado);
     }
 }

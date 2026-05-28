@@ -6,7 +6,12 @@ export class LotesController {
 
     selecionarTodos = async (req: Request, res: Response) => {
         try {
-            const lotes = await this._service.selecionarTodos();
+            const idUsuarioLogado = req.user?.login_id; 
+            if (!idUsuarioLogado) {
+                return res.status(401).json({ message: "Usuário não autenticado." });
+            }
+
+            const lotes = await this._service.selecionarTodos(idUsuarioLogado);
 
             return res.status(200).json({ lotes });
         } catch (error: unknown) {
@@ -24,17 +29,14 @@ export class LotesController {
 
     criar = async (req: Request, res: Response) => {
         try {
-            const {
-                idProduto,
-                quantidadeEntrada,
-                dataValidade
-            } = req.body;
+            const idUsuarioLogado = req.user?.login_id;
+            if (!idUsuarioLogado) {
+                return res.status(401).json({ message: "Usuário não autenticado." });
+            }
 
-            if (
-                !idProduto ||
-                !quantidadeEntrada ||
-                !dataValidade
-            ) {
+            const { idProduto, quantidadeEntrada, dataValidade } = req.body;
+
+            if (!idProduto || !quantidadeEntrada || !dataValidade) {
                 return res.status(400).json({
                     message: "Preencha todos os campos"
                 });
@@ -43,7 +45,8 @@ export class LotesController {
             const novo = await this._service.criar(
                 Number(idProduto),
                 Number(quantidadeEntrada),
-                new Date(dataValidade)
+                new Date(dataValidade),
+                idUsuarioLogado
             );
 
             return res.status(201).json({ novo });
@@ -62,13 +65,13 @@ export class LotesController {
 
     editar = async (req: Request, res: Response) => {
         try {
-            const idLote = Number(req.params.id);
+            const idUsuarioLogado = req.user?.login_id;
+            if (!idUsuarioLogado) {
+                return res.status(401).json({ message: "Usuário não autenticado." });
+            }
 
-            const {
-                idProduto,
-                quantidadeEntrada,
-                dataValidade
-            } = req.body;
+            const idLote = Number(req.params.id);
+            const { idProduto, quantidadeEntrada, dataValidade } = req.body;
 
             if (!idLote || isNaN(idLote)) {
                 return res.status(400).json({
@@ -76,11 +79,17 @@ export class LotesController {
                 });
             }
 
+            const loteAtual = await this._service.selecionaById(idLote, idUsuarioLogado);
+            if (!loteAtual) {
+                return res.status(403).json({ message: "Você não tem permissão para alterar este lote" });
+            }
+
             const alterado = await this._service.editar(
                 idLote,
                 Number(idProduto),
                 Number(quantidadeEntrada),
-                new Date(dataValidade)
+                new Date(dataValidade),
+                idUsuarioLogado
             );
 
             return res.status(200).json({ alterado });
@@ -99,6 +108,11 @@ export class LotesController {
 
     deletar = async (req: Request, res: Response) => {
         try {
+            const idUsuarioLogado = req.user?.login_id;
+            if (!idUsuarioLogado) {
+                return res.status(401).json({ message: "Usuário não autenticado." });
+            }
+
             const idLote = Number(req.params.id);
 
             if (!idLote || isNaN(idLote)) {
@@ -107,7 +121,12 @@ export class LotesController {
                 });
             }
 
-            const deletado = await this._service.deletar(idLote);
+            const loteAtual = await this._service.selecionaById(idLote, idUsuarioLogado);
+            if (!loteAtual) {
+                return res.status(403).json({ message: "Você não tem permissão para deletar este lote" });
+            }
+
+            const deletado = await this._service.deletar(idLote, idUsuarioLogado);
 
             return res.status(200).json({
                 message: "Excluído com sucesso",
@@ -128,6 +147,11 @@ export class LotesController {
 
     selecionaById = async (req: Request, res: Response) => {
         try {
+            const idUsuarioLogado = req.user?.login_id;
+            if (!idUsuarioLogado) {
+                return res.status(401).json({ message: "Usuário não autenticado." });
+            }
+
             const idLote = Number(req.params.id);
 
             if (!idLote || isNaN(idLote)) {
@@ -136,11 +160,11 @@ export class LotesController {
                 });
             }
 
-            const lote = await this._service.selecionaById(idLote);
+            const lote = await this._service.selecionaById(idLote, idUsuarioLogado);
 
             if (!lote) {
                 return res.status(404).json({
-                    message: "Lote não encontrado"
+                    message: "Lote não encontrado ou você não tem permissão"
                 });
             }
 

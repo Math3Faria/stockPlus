@@ -4,15 +4,16 @@ import { Estoque } from "../models/estoque.model";
 export class EstoqueService {
     constructor(private _repository = new EstoqueRepository()) {}
 
-    async selecionarTodos() {
-        return await this._repository.findAll();
+    async selecionarTodos(idUsuarioLogado: number) {
+        return await this._repository.findAll(idUsuarioLogado);
     }
 
     async criar(
         idProduto: number,
         qtdAtual: number,
         qtdMinima: number,
-        qtdMaxima: number
+        qtdMaxima: number,
+        idUsuarioLogado: number
     ) {
         const estoque = Estoque.criar(
             idProduto,
@@ -21,7 +22,7 @@ export class EstoqueService {
             qtdMaxima
         );
 
-        return await this._repository.create(estoque);
+        return await this._repository.create(estoque, idUsuarioLogado);
     }
 
     async editar(
@@ -29,7 +30,8 @@ export class EstoqueService {
         idProduto: number,
         qtdAtual: number,
         qtdMinima: number,
-        qtdMaxima: number
+        qtdMaxima: number,
+        idUsuarioLogado: number
     ) {
         const estoque = Estoque.editar(
             idEstoque,
@@ -39,14 +41,14 @@ export class EstoqueService {
             qtdMaxima
         );
 
-        return await this._repository.update(idEstoque, estoque);
+        return await this._repository.update(idEstoque, estoque, idUsuarioLogado);
     }
 
-    async deletar(idEstoque: number) {
-        return await this._repository.delete(idEstoque);
+    async deletar(idEstoque: number, idUsuarioLogado: number) {
+        return await this._repository.delete(idEstoque, idUsuarioLogado);
     }
 
-    async selecionaById(idEstoque: number) {
-        return await this._repository.findById(idEstoque);
+    async selecionaById(idEstoque: number, idUsuarioLogado: number) {
+        return await this._repository.findById(idEstoque, idUsuarioLogado);
     }
 }

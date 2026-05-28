@@ -8,8 +8,7 @@ export class MovimentacaoService {
             new MovimentacaoRepository()
     ) { }
 
-    async criar(dados: iMovimentacaoEstoque): Promise<number> {
-
+    async criar(dados: iMovimentacaoEstoque, idUsuarioLogado: number): Promise<number> {
 
         if (!dados.idProduto) {
             throw new Error(
@@ -50,20 +49,17 @@ export class MovimentacaoService {
             );
         }
 
-        // Trigger do banco atualiza estoque/lotes
-
-        return await this.repository.insert(dados);
+        return await this.repository.insert(dados, idUsuarioLogado);
     }
 
-    async listar(): Promise<iMovimentacaoEstoque[]> {
-
-        return await this.repository
-            .selectAll();
+    async listar(idUsuarioLogado: number): Promise<iMovimentacaoEstoque[]> {
+        return await this.repository.selectAll(idUsuarioLogado);
     }
 
     async buscarPorId(
-        id: number
-    ): Promise<iMovimentacaoEstoque> {
+        id: number,
+        idUsuarioLogado: number
+    ): Promise<iMovimentacaoEstoque | null> {
 
         if (!id || id <= 0) {
             throw new Error(
@@ -73,13 +69,7 @@ export class MovimentacaoService {
 
         const result =
             await this.repository
-                .selectById(id);
-
-        if (!result) {
-            throw new Error(
-                "Movimentação não encontrada"
-            );
-        }
+                .selectById(id, idUsuarioLogado);
 
         return result;
     }

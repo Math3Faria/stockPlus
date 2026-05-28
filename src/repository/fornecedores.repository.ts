@@ -4,25 +4,26 @@ import { iFornecedor } from "../models/fornecedores.model";
 
 export class FornecedorRepository {
 
-  async selectAll(): Promise<iFornecedor[]> {
-    const sql = "SELECT * FROM fornecedores";
-    const [rows] = await db.execute<iFornecedor[]>(sql);
+  async selectAll(idUsuarioLogado: number): Promise<iFornecedor[]> {
+    const sql = "SELECT * FROM fornecedores WHERE login_id = ?";
+    const [rows] = await db.execute<iFornecedor[]>(sql, [idUsuarioLogado]);
     return rows;
   }
 
-  async selectById(id: number): Promise<iFornecedor | null> {
-    const sql = "SELECT * FROM fornecedores WHERE idFornecedor = ?";
-    const [rows] = await db.execute<iFornecedor[]>(sql, [id]);
-    return rows[0];
+  async selectById(id: number, idUsuarioLogado: number): Promise<iFornecedor | null> {
+    const sql = "SELECT * FROM fornecedores WHERE idFornecedor = ? AND login_id = ?";
+    const [rows] = await db.execute<iFornecedor[]>(sql, [id, idUsuarioLogado]);
+    return rows[0] || null;
   }
 
   async insert(
     empresa: string,
     email: string,
-    cnpj: string
+    cnpj: string,
+    idUsuarioLogado: number
   ): Promise<number> {
-    const sql = "INSERT INTO fornecedores (empresa, email, cnpj) VALUES (?, ?, ?)";
-    const values = [empresa, email, cnpj];
+    const sql = "INSERT INTO fornecedores (empresa, email, cnpj, login_id) VALUES (?, ?, ?, ?)";
+    const values = [empresa, email, cnpj, idUsuarioLogado];
     const [rows] = await db.execute<ResultSetHeader>(sql, values);
     return rows.insertId;
   }
@@ -31,17 +32,18 @@ export class FornecedorRepository {
     id: number,
     empresa: string,
     email: string,
-    cnpj:string
+    cnpj: string,
+    idUsuarioLogado: number
   ): Promise<ResultSetHeader> {
-    const sql = "UPDATE fornecedores SET empresa = ?, email = ?, cnpj = ? WHERE idFornecedor = ?";
-    const values = [empresa, email, cnpj, id];
+    const sql = "UPDATE fornecedores SET empresa = ?, email = ?, cnpj = ? WHERE idFornecedor = ? AND login_id = ?";
+    const values = [empresa, email, cnpj, id, idUsuarioLogado];
     const [rows] = await db.execute<ResultSetHeader>(sql, values);
     return rows;
   }
 
-  async delete(id: number): Promise<ResultSetHeader> {
-    const sql = "DELETE FROM fornecedores WHERE idFornecedor = ?";
-    const [rows] = await db.execute<ResultSetHeader>(sql, [id]);
+  async delete(id: number, idUsuarioLogado: number): Promise<ResultSetHeader> {
+    const sql = "DELETE FROM fornecedores WHERE idFornecedor = ? AND login_id = ?";
+    const [rows] = await db.execute<ResultSetHeader>(sql, [id, idUsuarioLogado]);
     return rows;
   }
 }

@@ -7,7 +7,12 @@ export class AlertaController {
 
   selecionarTodos = async (req: Request, res: Response) => {
     try {
-      const alertas = await this.service.selecionarTodos();
+      const idUsuarioLogado = req.user?.login_id; 
+      if (!idUsuarioLogado) {
+        return res.status(401).json({ message: "Usuário não autenticado." });
+      }
+
+      const alertas = await this.service.selecionarTodos(idUsuarioLogado);
       return res.status(200).json(alertas);
 
     } catch (error) {

@@ -3,16 +3,17 @@ import { iAlerta } from "../models/alerta.model";
 import { ResultSetHeader } from "mysql2/promise";
 
 export class AlertaRepository {
-    async findAll(): Promise<iAlerta[]> {
+    async findAll(idUsuarioLogado: number): Promise<iAlerta[]> {
         const [rows] = await db.execute<iAlerta[]>(
-            "SELECT * FROM Alerta ORDER BY dataGeracao DESC;"
+            "SELECT * FROM Alerta WHERE login_id = ? ORDER BY dataGeracao DESC;",
+            [idUsuarioLogado]
         );
         return rows;
     }
 
-    async marcarComoLido(idAlerta: number): Promise<ResultSetHeader> {
-        const sql = "UPDATE Alerta SET foiVisualizado = true WHERE idAlerta = ?;";
-        const [rows] = await db.execute<ResultSetHeader>(sql, [idAlerta]);
+    async marcarComoLido(idAlerta: number, idUsuarioLogado: number): Promise<ResultSetHeader> {
+        const sql = "UPDATE Alerta SET foiVisualizado = true WHERE idAlerta = ? AND login_id = ?;";
+        const [rows] = await db.execute<ResultSetHeader>(sql, [idAlerta, idUsuarioLogado]);
         return rows;
     }
 }
