@@ -5,12 +5,12 @@ export class UsuarioService {
 
   constructor(private repository = new UsuarioRepository()) { }
 
-  private montarResposta(usuarioDB: UsuarioDB): Usuario {
+  private montarResposta(usuarioDB: any): Usuario {
     return new Usuario(
       usuarioDB.nome,
       usuarioDB.email,
       usuarioDB.senha,
-      usuarioDB.id_usuario
+      usuarioDB.login_id 
     );
   };
 
@@ -28,6 +28,7 @@ export class UsuarioService {
 
     return this.montarResposta(usuario);
   };
+
   async selecionarPorNome(nome: string) {
     const usuario = await this.repository.selectByName(nome);
 
@@ -37,6 +38,7 @@ export class UsuarioService {
 
     return this.montarResposta(usuario);
   };
+
   async selecionarPorSenha(senha: string) {
     const usuario = await this.repository.selectBySenha(senha);
 
@@ -46,7 +48,6 @@ export class UsuarioService {
 
     return this.montarResposta(usuario);
   };
-
 
   async selecionarPorEmail(email: string) {
     const usuario = await this.repository.selectByEmail(email);
@@ -64,7 +65,6 @@ export class UsuarioService {
     if (emailExiste) {
       throw new Error("Já existe um usuário com esse email");
     };
-
 
     const usuario = Usuario.criar(nome, email, senha);
 

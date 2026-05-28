@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { UsuarioService } from "../services/usuario.service";
 import { JwtService } from "../utils/JwtServices";
-import bcrypt from 'bcryptjs'
+import bcrypt from 'bcryptjs';
 
 export class UsuarioController {
   private service: UsuarioService;
@@ -13,7 +13,6 @@ export class UsuarioController {
     this.jwtService = new JwtService();
     this.bcryptRounds = Number(process.env.BCRYPT_ROUNDS) || 10;
   }
-
 
     selecionaTodos = async (req: Request, res: Response) => {
         try {
@@ -38,10 +37,13 @@ export class UsuarioController {
 
     criarUsuario = async (req: Request, res: Response) => {
         try {
-            const { nome, email, senha } = req.body
+            const { nome, email, senha } = req.body;
+
+            if (!nome || !email || !senha) {
+                return res.status(400).json({ message: "Campos obrigatórios ausentes: nome, email e senha devem ser preenchidos." });
+            }
 
             const senha_hash = await bcrypt.hash(senha, this.bcryptRounds);
-
             const novo = await this.service.criarUsuario(nome, email, senha_hash);
 
             return res.status(201).json({ message: "Usuário criado com sucesso", result: novo });
@@ -58,9 +60,11 @@ export class UsuarioController {
             const { nome, email, senha } = req.body;
 
             if (isNaN(idUsuario)) { return res.status(400).json({ message: "ID inválido" }); }
+            if (!nome || !email || !senha) {
+                return res.status(400).json({ message: "Campos obrigatórios ausentes: nome, email e senha devem ser preenchidos." });
+            }
 
             const senha_hash = await bcrypt.hash(senha, this.bcryptRounds);
-
             const alterado = await this.service.editarUsuario(idUsuario, nome, email, senha_hash);
 
             return res.status(200).json({ message: "Atualizado com sucesso", result: alterado });
@@ -89,38 +93,37 @@ export class UsuarioController {
       const { email, senha } = req.body;
 
       if (!email || !senha) {
-        return res.status(400).json({ message: 'Usúario e senha são obrigatórios' })
+        return res.status(400).json({ message: 'Usuário e senha são obrigatórios' });
       }
 
-      const user = await this.service.selecionarPorEmail(email)
+      const user = await this.service.selecionarPorEmail(email);
 
       if (!user) {
-        return res.status(400).json({ message: 'Usúario não encontrado' })
+        return res.status(400).json({ message: 'Usuário não encontrado' });
       }
 
       const senhaMatch = await bcrypt.compare(senha, user.Senha);
       if (!senhaMatch) {
-        return res.status(400).json({ message: 'Credenciais inválidas' })
+        return res.status(400).json({ message: 'Credenciais inválidas' });
       }
 
       const payload = { login_id: user.Id!, email: user.Email, nome: user.Nome }; 
-      const acessToken = this.jwtService.gerarTokenAcesso(payload);
+      const accessToken = this.jwtService.gerarTokenAcesso(payload);
 
-        res.status(201).json({
-            message: 'Login realizado com sucesso',
-            data: {
-                expira_em: process.env.JWT_EXPIRES_IN,
-                token_acesso: acessToken
-            }
-        });
+      return res.status(201).json({
+          message: 'Login realizado com sucesso',
+          data: {
+              expira_em: process.env.JWT_EXPIRES_IN,
+              token_acesso: accessToken
+          }
+      });
 
     } catch (error) {
       console.error(error);
-      if (error instanceof Error)
+      if (error instanceof Error) {
         return res.status(500).json({ message: "Ocorreu um erro no servidor", errorMessage: error.message });
+      }
+      return res.status(500).json({ message: "Ocorreu um erro no servidor", errorMessage: "Erro desconhecido" });
     }
-    res.status(500).json({ message: "Ocorreu um erro no servidor", errorMessage: "Erro desconhecido" });
-  }
-;
-
+  };
 }

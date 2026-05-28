@@ -13,7 +13,7 @@ export class AlertaRepository {
 
     async marcarComoLido(idAlerta: number, idUsuarioLogado: number): Promise<ResultSetHeader> {
         const sql = "UPDATE Alerta SET foiVisualizado = true WHERE idAlerta = ? AND login_id = ?;";
-        const [rows] = await db.execute<ResultSetHeader>(sql, [idAlerta, idUsuarioLogado]);
-        return rows;
+        const [result] = await db.execute<ResultSetHeader>(sql, [idAlerta, idUsuarioLogado]);
+        return result;
     }
 }
