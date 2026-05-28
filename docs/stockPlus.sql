@@ -46,7 +46,6 @@ create table if not exists Estoque(
 );
 
 create table if not exists MovimentacaoEstoque(
-<<<<<<< HEAD
     idMovimentacao int auto_increment primary key,
     idProduto int not null,
     tipo VARCHAR(20) not null,
@@ -55,16 +54,6 @@ create table if not exists MovimentacaoEstoque(
     descricao varchar(150) null,
     dataMovimentacao timestamp default current_timestamp,
     foreign key (idProduto) references Produtos(idProduto)
-=======
-idMovimentacao int auto_increment primary key,
-idProduto int not null,
-tipo VARCHAR(20) not null,
-quantidade int not null,
-dataValidade date null,
-descricao varchar(150) null,
-dataMovimentacao timestamp default current_timestamp,
-foreign key (idProduto) references Produtos(idProduto)
->>>>>>> lucas_ferreira1
 );
 
 create table if not exists Lotes(
@@ -87,13 +76,15 @@ create table if not exists Alerta (
 );
 
 DELIMITER $$
-<<<<<<< HEAD
 CREATE PROCEDURE proc_verificar_vencimento()
 BEGIN 
     SELECT idProduto, quantidadeEntrada, dataValidade, DATEDIFF(dataValidade, CURDATE()) AS dias_para_vencer 
     FROM Lotes 
     WHERE DATEDIFF(dataValidade, CURDATE()) = 45 OR DATEDIFF(dataValidade, CURDATE()) = 90; 
-=======
+END$$
+DELIMITER ;
+
+DELIMITER $$
 
 CREATE TRIGGER trg_atualizar_estoque
 AFTER INSERT ON MovimentacaoEstoque
@@ -134,13 +125,8 @@ BEGIN
 
     END IF;
 
->>>>>>> lucas_ferreira1
 END$$
-DELIMITER ;
 
-<<<<<<< HEAD
-DELIMITER $$
-CREATE TRIGGER trg_atualizar_estoque AFTER INSERT ON MovimentacaoEstoque FOR EACH ROW BEGIN IF NEW.tipo = 'ENTRADA' THEN UPDATE Estoque SET qtdAtual = qtdAtual + NEW.quantidade WHERE idProduto = NEW.idProduto; IF NEW.dataValidade IS NOT NULL AND NEW.descricao IS NOT NULL AND LOWER(NEW.descricao) LIKE '%lote%' THEN INSERT INTO Lotes (idProduto, quantidadeEntrada, dataValidade) VALUES (NEW.idProduto, NEW.quantidade, NEW.dataValidade); END IF; ELSEIF NEW.tipo = 'SAIDA' THEN UPDATE Estoque SET qtdAtual = qtdAtual - NEW.quantidade WHERE idProduto = NEW.idProduto; END IF; END$$
 DELIMITER ;
 
 DELIMITER $$
@@ -157,6 +143,22 @@ BEGIN
     SELECT 'VENCIMENTO_45', idProduto, 'Produto com 45 dias para vencer'
     FROM Produtos 
     WHERE DATEDIFF(dataVencimento, CURDATE()) = 45;
+    
+    INSERT INTO Alerta (tipo, idProduto, mensagem)
+    SELECT
+        'ESTOQUE_MINIMO',
+        e.idProduto,
+        CONCAT('Estoque próximo ao mínimo: Produto "', p.nomeProduto,
+               '" com ', e.qtdAtual, ' unidades (mínimo: ', e.qtdMinima, ')')
+    FROM Estoque e
+    JOIN Produtos p ON e.idProduto = p.idProduto
+    WHERE e.qtdAtual <= (e.qtdMinima * 2)
+      AND NOT EXISTS (
+          SELECT 1 FROM Alerta a
+          WHERE a.idProduto = e.idProduto
+            AND a.tipo      = 'ESTOQUE_MINIMO'
+            AND DATE(a.dataGeracao) = CURDATE()
+      );
 END$$
 DELIMITER ;
 
@@ -166,9 +168,27 @@ STARTS CURRENT_TIMESTAMP
 DO CALL sp_gerarAlertas();
 
 CALL sp_gerarAlertas();
-SELECT * FROM Alerta
-=======
-DELIMITER ;
+SELECT * FROM Alerta;
 
 
->>>>>>> lucas_ferreira1
+CREATE OR REPLACE VIEW vw_produtos_estoque AS
+SELECT
+    p.idProduto,
+    p.nomeProduto,
+    c.descricao AS categoria,
+    f.empresa AS fornecedor,
+    p.valor,
+    e.qtdAtual,
+    e.qtdMinima,
+    e.qtdMaxima,
+    CASE
+        WHEN e.qtdAtual = 0 THEN 'Sem estoque'
+        WHEN e.qtdAtual <= e.qtdMinima THEN 'Estoque baixo'
+        WHEN e.qtdAtual >= e.qtdMaxima THEN 'Estoque alto'
+        ELSE 'Estoque normal'
+    END AS status_estoque,
+    p.dataCad
+FROM Produtos p
+INNER JOIN Categorias c ON p.idCategoria = c.idCategoria
+INNER JOIN Fornecedores f ON p.idFornecedor = f.idFornecedor
+INNER JOIN Estoque e ON p.idProduto = e.idProduto;
