@@ -6,15 +6,17 @@ import lotesRoutes from "./lotes.routes";
 import movimentacaoRouter from "./movimentacaoEstoque.routes";
 import produtoRoutes from "./produto.routes";
 import alertaRoutes from "./alerta.routes";
+import usuarioRoutes from "./usuario.routes";
 
 const router = Router();
 
-router.use('/', alertaRoutes)
+router.use('/', alertaRoutes);
 router.use('/', categoriaRoutes);
 router.use('/', estoqueRoutes);
 router.use('/', fornecedorRoutes);
 router.use('/', lotesRoutes);
 router.use('/', movimentacaoRouter);
 router.use('/', produtoRoutes);
+router.use('/', usuarioRoutes); 
 
 export default router;
