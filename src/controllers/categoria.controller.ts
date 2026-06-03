@@ -30,7 +30,7 @@ export class CategoriaController {
         return res.status(200).json(categoria);
       }
 
-      const categorias = await this.service.selecionarTodos(idUsuarioLogado);
+      const categorias = await this.service.selecionarTodos();
       return res.status(200).json(categorias);
 
     } catch (error) {

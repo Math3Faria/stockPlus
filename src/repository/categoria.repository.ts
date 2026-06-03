@@ -4,9 +4,9 @@ import { iCategoria } from "../models/categoria.model";
 
 export class CategoriaRepository {
 
-  async selectAll(idUsuarioLogado: number): Promise<iCategoria[]> {
-    const sql = "SELECT * FROM categorias WHERE login_id = ?";
-    const [rows] = await db.execute<iCategoria[]>(sql, [idUsuarioLogado]);
+  async selectAll(): Promise<iCategoria[]> {
+    const sql = "SELECT * FROM categorias";
+    const [rows] = await db.execute<iCategoria[]>(sql, []);
     return rows;
   }
 

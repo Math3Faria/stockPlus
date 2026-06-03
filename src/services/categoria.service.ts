@@ -6,8 +6,8 @@ export class CategoriaService {
 
   constructor(private repository = new CategoriaRepository()) { }
 
-  async selecionarTodos(idUsuarioLogado: number): Promise<iCategoria[]> {
-    return await this.repository.selectAll(idUsuarioLogado);
+  async selecionarTodos(): Promise<iCategoria[]> {
+    return await this.repository.selectAll();
   }
 
   async selecionarPorId(id: number, idUsuarioLogado: number): Promise<iCategoria | null> {
