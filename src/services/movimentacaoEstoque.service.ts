@@ -5,8 +5,10 @@ export class MovimentacaoService {
   constructor(
     private repository = new MovimentacaoRepository()
   ) {}
-
-  async criar(dados: Partial<iMovimentacaoEstoque> & { idFornecedor?: number }, idUsuarioLogado: number): Promise<number> {
+  async criar(
+    dados: Partial<iMovimentacaoEstoque> & { idFornecedor?: number; dataValidade?: string }, 
+    idUsuarioLogado: number
+  ): Promise<number> {
     if (!dados.idProduto) {
       throw new Error("Produto obrigatório");
     }
@@ -29,8 +31,13 @@ export class MovimentacaoService {
 
     const contemPalavraLote = dados.descricao?.toLowerCase().includes("lote");
     
-    if (dados.tipo === "ENTRADA" && contemPalavraLote && !dados.idFornecedor) {
-      throw new Error("ID do fornecedor é obrigatório para entradas de lote");
+    if (dados.tipo === "ENTRADA" && contemPalavraLote) {
+      if (!dados.idFornecedor) {
+        throw new Error("ID do fornecedor é obrigatório para entradas de lote");
+      }
+      if (!dados.dataValidade) {
+        throw new Error("A data de validade é obrigatória para registrar um lote");
+      }
     }
 
     return await this.repository.insert(dados, idUsuarioLogado);
@@ -46,7 +53,6 @@ export class MovimentacaoService {
     }
 
     const result = await this.repository.selectById(id, idUsuarioLogado);
-    
     return result;
   }
 }

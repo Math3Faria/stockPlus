@@ -4,15 +4,15 @@ import { JwtService } from "../utils/JwtServices";
 import bcrypt from 'bcryptjs';
 
 export class UsuarioController {
-  private service: UsuarioService;
-  private jwtService: JwtService;
-  private bcryptRounds: number;
+    private service: UsuarioService;
+    private jwtService: JwtService;
+    private bcryptRounds: number;
 
-  constructor() {
-    this.service = new UsuarioService();
-    this.jwtService = new JwtService();
-    this.bcryptRounds = Number(process.env.BCRYPT_ROUNDS) || 10;
-  }
+    constructor() {
+        this.service = new UsuarioService();
+        this.jwtService = new JwtService();
+        this.bcryptRounds = Number(process.env.BCRYPT_ROUNDS) || 10;
+    }
 
     selecionaTodos = async (req: Request, res: Response) => {
         try {
@@ -88,42 +88,43 @@ export class UsuarioController {
         }
     };
 
-  login = async (req: Request, res: Response) => {
-    try {
-      const { email, senha } = req.body;
+    login = async (req: Request, res: Response) => {
+        try {
+            const { email, senha } = req.body;
 
-      if (!email || !senha) {
-        return res.status(400).json({ message: 'Usuário e senha são obrigatórios' });
-      }
+            if (!email || !senha) {
+                return res.status(400).json({ message: 'Usuário e senha são obrigatórios' });
+            }
 
-      const user = await this.service.selecionarPorEmail(email);
+            const user = await this.service.selecionarPorEmail(email);
 
-      if (!user) {
-        return res.status(400).json({ message: 'Usuário não encontrado' });
-      }
+            if (!user) {
+                return res.status(400).json({ message: 'Usuário não encontrado' });
+            }
 
-      const senhaMatch = await bcrypt.compare(senha, user.Senha);
-      if (!senhaMatch) {
-        return res.status(400).json({ message: 'Credenciais inválidas' });
-      }
+            const senhaMatch = await bcrypt.compare(senha, user.Senha);
+            if (!senhaMatch) {
+                return res.status(400).json({ message: 'Credenciais inválidas' });
+            }
 
-      const payload = { login_id: user.Id!, email: user.Email, nome: user.Nome }; 
-      const accessToken = this.jwtService.gerarTokenAcesso(payload);
+            const payload = { login_id: user.Id!, email: user.Email, nome: user.Nome };
+            const accessToken = this.jwtService.gerarTokenAcesso(payload);
 
-      return res.status(201).json({
-          message: 'Login realizado com sucesso',
-          data: {
-              expira_em: process.env.JWT_EXPIRES_IN,
-              token_acesso: accessToken
-          }
-      });
+            return res.status(201).json({
+                token: accessToken,
+                usuario: {
+                    id: user.Id,
+                    nome: user.Nome,
+                    email: user.Email
+                }
+            });
 
-    } catch (error) {
-      console.error(error);
-      if (error instanceof Error) {
-        return res.status(500).json({ message: "Ocorreu um erro no servidor", errorMessage: error.message });
-      }
-      return res.status(500).json({ message: "Ocorreu um erro no servidor", errorMessage: "Erro desconhecido" });
-    }
-  };
+        } catch (error) {
+            console.error(error);
+            if (error instanceof Error) {
+                return res.status(500).json({ message: "Ocorreu um erro no servidor", errorMessage: error.message });
+            }
+            return res.status(500).json({ message: "Ocorreu um erro no servidor", errorMessage: "Erro desconhecido" });
+        }
+    };
 }

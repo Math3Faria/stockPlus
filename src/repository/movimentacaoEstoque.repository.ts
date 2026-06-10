@@ -10,7 +10,7 @@ export class MovimentacaoRepository {
       dados.idProduto ?? null,
       dados.tipo ?? null,
       dados.quantidade ?? null,
-      dados.dataValidade ? new Date(dados.dataValidade) : null,
+      dados.dataValidade ?? null,
       dados.descricao ?? null,
       idUsuarioLogado,
       dados.idFornecedor ?? null
@@ -30,6 +30,11 @@ export class MovimentacaoRepository {
     const sql = "SELECT * FROM MovimentacaoEstoque WHERE idMovimentacao = ? AND login_id = ?;";
     const values = [id, idUsuarioLogado];
     const [rows] = await db.execute<any>(sql, values as any[]);
-    return (rows[0] as iMovimentacaoEstoque) || null;
+    
+    if (Array.isArray(rows) && rows.length > 0) {
+      return rows[0] as iMovimentacaoEstoque;
+    }
+    
+    return null;
   }
 }
