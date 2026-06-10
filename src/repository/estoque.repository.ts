@@ -18,13 +18,7 @@ export class EstoqueRepository {
             VALUES (?, ?, ?, ?, ?)
         `;
 
-        const values = [
-            dados.idProduto,
-            dados.qtdAtual,
-            dados.qtdMinima,
-            dados.qtdMaxima,
-            idUsuarioLogado
-        ];
+        const values = [dados.idProduto,dados.qtdAtual,dados.qtdMinima,dados.qtdMaxima,idUsuarioLogado];
 
         const [rows] = await db.execute<ResultSetHeader>(sql, values);
         return rows;
@@ -41,14 +35,7 @@ export class EstoqueRepository {
             WHERE idEstoque = ? AND login_id = ?
         `;
 
-        const values = [
-            dados.idProduto,
-            dados.qtdAtual,
-            dados.qtdMinima,
-            dados.qtdMaxima,
-            idEstoque,
-            idUsuarioLogado
-        ];
+        const values = [dados.idProduto,dados.qtdAtual,dados.qtdMinima,dados.qtdMaxima,idEstoque,idUsuarioLogado];
 
         const [rows] = await db.execute<ResultSetHeader>(sql, values);
         return rows;

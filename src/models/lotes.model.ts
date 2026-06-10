@@ -53,7 +53,6 @@ export class Lote {
         );
     }
 
-    // Getters
     public get idLote(): number | undefined {
         return this._idLote;
     }

@@ -6,15 +6,7 @@ export class MovimentacaoRepository {
   async insert(dados: any, idUsuarioLogado: number): Promise<number> {
     const sql = `INSERT INTO MovimentacaoEstoque(idProduto, tipo, quantidade, dataValidade, descricao, login_id, idFornecedor) VALUES (?, ?, ?, ?, ?, ?, ?)`;
 
-    const values = [
-      dados.idProduto ?? null,
-      dados.tipo ?? null,
-      dados.quantidade ?? null,
-      dados.dataValidade ?? null,
-      dados.descricao ?? null,
-      idUsuarioLogado,
-      dados.idFornecedor ?? null
-    ];
+    const values = [dados.idProduto ?? null,dados.tipo ?? null,dados.quantidade ?? null,dados.dataValidade ?? null,dados.descricao ?? null,idUsuarioLogado,dados.idFornecedor ?? null];
 
     const [rows] = await db.execute<ResultSetHeader>(sql, values as any[]);
     return rows.insertId;

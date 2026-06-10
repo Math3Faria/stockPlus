@@ -25,7 +25,6 @@ export class Fornecedor {
         this._idFornecedor = id;
     }
 
-    // Getters
     public get Id(): number | undefined {
         return this._idFornecedor;
     }
@@ -42,7 +41,6 @@ export class Fornecedor {
         return this._cnpj;
     }
 
-    // Setters
     public set Empresa(value: string) {
         this._validarEmpresa(value);
         this._empresa = value;
@@ -57,7 +55,6 @@ export class Fornecedor {
         this._cnpj = value;
     }
 
-    // Factory
     public static criar(
         empresa: string,
         email: string,

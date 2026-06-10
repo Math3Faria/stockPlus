@@ -17,7 +17,6 @@ export class Categoria {
         this._id_categoria = id;
     }
 
-    // Getters
     public get Id(): number | undefined {
         return this._id_categoria;
     }
@@ -26,13 +25,11 @@ export class Categoria {
         return this._descricao;
     }
 
-    // Setters
     public set Descricao(value: string) {
         this._validarDescricao(value);
         this._descricao = value;
     }
 
-    // Factory
     public static criar(
         descricao: string
     ): Categoria {
