@@ -2,10 +2,10 @@ import { EstoqueRepository } from "../repository/estoque.repository";
 import { Estoque } from "../models/estoque.model";
 
 export class EstoqueService {
-    constructor(private _repository = new EstoqueRepository()) {}
+    constructor(private _repository = new EstoqueRepository()) { }
 
     async selecionarTodos(idUsuarioLogado: number) {
-        return await this._repository.findAll(idUsuarioLogado);
+        return await this._repository.findAll();
     }
 
     async criar(

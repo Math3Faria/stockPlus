@@ -4,8 +4,8 @@ import { ResultSetHeader } from "mysql2/promise";
 
 export class ProdutoRepository {
 
-    async findAll(idUsuarioLogado: number): Promise<IProduto[]> {
-        const [rows] = await db.execute<IProduto[]>("SELECT * FROM Produtos WHERE login_id = ?", [idUsuarioLogado]);
+    async findAll(): Promise<IProduto[]> {
+        const [rows] = await db.execute<IProduto[]>("SELECT * FROM Produtos");
         return rows;
     }
 
